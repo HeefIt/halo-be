@@ -1,0 +1,121 @@
+# 服务配置
+server:
+  port: 2004
+
+# Spring配置
+spring:
+  application:
+    name: club-subject
+  profiles:
+    active: dev
+    # config:
+    # import: optional:nacos:${spring.application.name}
+
+  # 数据源配置
+  datasource:
+    # 基础连接配置
+    username: root
+    password: "1234"  # GuEFg+3vX50ExA6ZOTI7crf887ZLWJmEF3DvrN+JDrERgpp7dM1P6L4TjGb/BjP8KbIurA4Y5V8lWLZTfoSlzA==
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/halo?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    # Druid连接池配置
+    druid:
+      # 连接池大小配置
+      initial-size: 20
+      min-idle: 20
+      max-active: 100
+      max-wait: 60000
+
+      # 监控配置
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: "123456"
+
+      # 过滤器配置
+      filter:
+        stat:
+          enabled: true
+          slow-sql-millis: 2000
+          log-slow-sql: true
+        wall:
+          enabled: true
+        config:
+          enabled: true
+
+  # Redis配置
+  data:
+    redis:
+      # 连接配置
+      database: 15
+      host: 192.168.171.100
+      port: 6379
+      password: "12321"
+      timeout: 10s
+      # 连接池配置
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+
+  # MyBatis Plus配置
+  mybatis-plus:
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+################################################
+# Sa-Token 配置 (文档: https://sa-token.cc) #
+################################################
+sa-token:
+  # token 名称（同时也是 cookie 名称）
+  token-name: satoken
+  
+  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
+  timeout: 2592000
+  
+  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+  active-timeout: -1
+  
+  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+  is-concurrent: true
+  
+  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
+  is-share: false
+  
+  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
+  token-style: uuid
+  
+  # 是否输出操作日志
+  is-log: true
+
+# 日志配置
+logging:
+  config: classpath:logback-spring.xml
+
+# Nacos配置（已注释）
+#spring:
+#  cloud:
+#    nacos:
+#      config:
+#        server-addr: localhost:8848
+#        prefix: ${spring.application.name}
+#        group: DEFAULT_GROUP
+#        namespace:
+#        file-extension: yaml
+#      discovery:
+#        enabled: true
+#        server-addr: localhost:8848
+
+# RocketMQ配置（已注释）
+#rocketmq:
+#  name-server: 192.168.171.100:9876
+#  producer:
+#    group: canal-cache-consumer-group
+#    send-message-timeout: 3000
+#    retry-times: 3
+#    max-message-size: 1048576
