@@ -103,23 +103,25 @@ public class AuthController {
             return Result.ok(result);
         } catch (Exception e) {
             log.error("用户删除接口: ", e);
-            return Result.fail( e.getMessage());
+            return Result.fail(e.getMessage());
         }
     }
 
     /**
      * 用户修改
-     * @param authUserDTO
+     *
+     * @param id,authUserDTO
      * @return
      */
-    @PostMapping("/user/update")
-    private Result<Boolean> update(@RequestBody AuthUserDTO authUserDTO) {
+    @PutMapping("/user/update/{id}")
+    private Result<Boolean> update(@PathVariable Long id,
+                                   @RequestBody AuthUserDTO authUserDTO) {
         try {
             if (log.isInfoEnabled()) {
                 log.info("AuthController.update.dto: {}"
                         , JSON.toJSONString(authUserDTO));
             }
-            Boolean result = authService.update(authUserDTO);
+            Boolean result = authService.update(id,authUserDTO);
             return Result.ok(result);
         } catch (Exception e) {
             log.error("用户修改接口: ", e);
@@ -127,6 +129,21 @@ public class AuthController {
         }
     }
 
+    /**
+     * 根据用户id查询用户信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/user/queryById/{id}")
+    private Result<AuthUserDTO> queryById(@PathVariable Long id){
+        try {
+            AuthUserDTO result = authService.queryById(id);
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("根据用户id查询用户信息接口: ", e);
+            return Result.fail(e.getMessage());
+        }
+    }
 
 
 }

@@ -9,9 +9,15 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author heefM
  * @date 2025-10-31
+
  */
 @Configuration
 public class MybatisConfiguration {
+    /**
+     * 配置MybatisPlus拦截器，用于打印完整的SQL日志
+     * 
+     * @return MybatisPlusInterceptor 拦截器实例
+     */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(){
 
@@ -19,4 +25,5 @@ public class MybatisConfiguration {
         mybatisPlusInterceptor.addInnerInterceptor(new MybatisPlusAllSqlLog());
         return mybatisPlusInterceptor;
     }
+
 }

@@ -39,5 +39,12 @@ public interface AuthService {
      * @param authUserDTO
      * @return
      */
-    Boolean update(AuthUserDTO authUserDTO);
+    Boolean update(Long id,AuthUserDTO authUserDTO);
+
+    /**
+     * 根据用户id查询用户信息
+     * @param id
+     * @return
+     */
+    AuthUserDTO queryById(Long id);
 }

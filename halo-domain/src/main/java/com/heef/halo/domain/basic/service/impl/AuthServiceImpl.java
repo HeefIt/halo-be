@@ -206,11 +206,11 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 用户修改
-     * @param authUserDTO
+     * @param id,authUserDTO
      * @return
      */
     @Override
-    public Boolean update(AuthUserDTO authUserDTO) {
+    public Boolean update(Long id,AuthUserDTO authUserDTO) {
         // 添加调试日志
         System.out.println("接收到的DTO: " + authUserDTO);
 
@@ -221,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
 
 
         //根据id查询用户是否存在--用户的id不可能被修改
-        AuthUser user = authUserMapper.selectById(authUser.getId());
+        AuthUser user = authUserMapper.selectById(id);
         if(user==null){
             throw new RuntimeException("用户不存在!");
         }
@@ -229,6 +229,24 @@ public class AuthServiceImpl implements AuthService {
         int updated = authUserMapper.update(authUser);
 
         return updated!=0;
+    }
+
+    /**
+     * 根据用户id查询用户
+     * @param id
+     * @return
+     */
+    @Override
+    public AuthUserDTO queryById(Long id) {
+        //根据传递的id查询数据库
+        AuthUser authUser = authUserMapper.selectById(id);
+        if(authUser==null){
+            throw new RuntimeException("用户不存在");
+        }
+        //对象转换返回
+        AuthUserDTO authUserDTO = authConvert.toDto(authUser);
+
+        return authUserDTO;
     }
 
 
