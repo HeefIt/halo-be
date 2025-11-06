@@ -1,4 +1,4 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.config.mybatisplus;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import lombok.extern.slf4j.Slf4j;

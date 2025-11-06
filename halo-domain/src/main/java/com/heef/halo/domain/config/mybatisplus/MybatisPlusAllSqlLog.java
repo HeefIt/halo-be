@@ -1,4 +1,4 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.config.mybatisplus;
 
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import org.apache.ibatis.executor.Executor;

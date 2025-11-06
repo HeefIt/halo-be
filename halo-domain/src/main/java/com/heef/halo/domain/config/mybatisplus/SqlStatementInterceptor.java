@@ -1,4 +1,4 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.config.mybatisplus;
 
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;

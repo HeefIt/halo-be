@@ -1,4 +1,4 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.config.mybatisplus;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import org.springframework.context.annotation.Bean;

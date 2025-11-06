@@ -1,5 +1,6 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.config.threadPool;
 
+import com.heef.halo.domain.config.threadPool.CustomerNameThreadFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
