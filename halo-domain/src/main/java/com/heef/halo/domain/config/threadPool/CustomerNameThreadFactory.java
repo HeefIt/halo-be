@@ -1,4 +1,4 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.config.threadPool;
 
 import org.apache.commons.lang3.StringUtils;
 

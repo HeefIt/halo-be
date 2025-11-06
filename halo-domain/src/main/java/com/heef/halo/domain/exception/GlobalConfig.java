@@ -1,14 +1,15 @@
-package com.heef.halo.domain.config;
+package com.heef.halo.domain.exception;
 
+import cn.dev33.satoken.interceptor.SaInterceptor;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.heef.halo.domain.intercepror.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
@@ -21,20 +22,24 @@ import java.util.List;
 @Configuration
 public class GlobalConfig extends WebMvcConfigurationSupport {
 
+
     @Override
-    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        super.configureMessageConverters(converters);
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(mappingJackson2HttpMessageConverter());
     }
 
     /**
-     * 添加拦截器
+     * 注册saToken拦截器
      * @param registry
      */
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/**");
+        // 注册 Sa-Token 拦截器，打开注解式鉴权功能
+        registry.addInterceptor(new SaInterceptor(handler -> {
+            // 根据注解判断权限
+        })).addPathPatterns("/**");
+        
+        super.addInterceptors(registry);
     }
 
     /**
@@ -52,7 +57,5 @@ public class GlobalConfig extends WebMvcConfigurationSupport {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return new MappingJackson2HttpMessageConverter(objectMapper);
     }
-
-
 
 }

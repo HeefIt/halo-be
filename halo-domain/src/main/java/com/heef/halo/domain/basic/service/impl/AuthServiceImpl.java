@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.service.impl;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -147,7 +148,7 @@ public class AuthServiceImpl implements AuthService {
      * @return
      */
     @Override
-    public Boolean login(AuthUserDTO authUserDTO) {
+    public SaTokenInfo login(AuthUserDTO authUserDTO) {
         //1.转换对象
         AuthUser authUser = authConvert.toEntity(authUserDTO);
 
@@ -172,8 +173,12 @@ public class AuthServiceImpl implements AuthService {
         // 5. 执行登录
         StpUtil.login(user.getId());
 
+        // 6. 获取 Token 信息
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+
         log.info("用户登录成功: {}", user.getUserName());
-        return true;
+
+        return tokenInfo;
     }
 
     /**
@@ -206,11 +211,12 @@ public class AuthServiceImpl implements AuthService {
 
     /**
      * 用户修改
+     *
      * @param id,authUserDTO
      * @return
      */
     @Override
-    public Boolean update(Long id,AuthUserDTO authUserDTO) {
+    public Boolean update(Long id, AuthUserDTO authUserDTO) {
         // 添加调试日志
         System.out.println("接收到的DTO: " + authUserDTO);
 
@@ -222,17 +228,18 @@ public class AuthServiceImpl implements AuthService {
 
         //根据id查询用户是否存在--用户的id不可能被修改
         AuthUser user = authUserMapper.selectById(id);
-        if(user==null){
+        if (user == null) {
             throw new RuntimeException("用户不存在!");
         }
         //修改用户信息
         int updated = authUserMapper.update(authUser);
 
-        return updated!=0;
+        return updated != 0;
     }
 
     /**
      * 根据用户id查询用户
+     *
      * @param id
      * @return
      */
@@ -240,13 +247,70 @@ public class AuthServiceImpl implements AuthService {
     public AuthUserDTO queryById(Long id) {
         //根据传递的id查询数据库
         AuthUser authUser = authUserMapper.selectById(id);
-        if(authUser==null){
+        if (authUser == null) {
             throw new RuntimeException("用户不存在");
         }
         //对象转换返回
         AuthUserDTO authUserDTO = authConvert.toDto(authUser);
 
         return authUserDTO;
+    }
+
+
+    /**
+     * 批量新增用户
+     *
+     * @param authUserDTOList
+     * @return
+     */
+    @Override
+    public Boolean insertBatch(List<AuthUserDTO> authUserDTOList) {
+
+        // 1. 参数校验
+        if (authUserDTOList == null || authUserDTOList.isEmpty()) {
+            throw new IllegalArgumentException("用户列表不能为空");
+        }
+
+        // 2. 数据量控制（防止一次性插入过多数据）
+        if (authUserDTOList.size() > 1000) {
+            throw new IllegalArgumentException("单次批量插入不能超过1000条记录");
+        }
+
+        // 3. 业务数据校验
+        for (AuthUserDTO dto : authUserDTOList) {
+            if (dto.getUserName() == null || dto.getUserName().trim().isEmpty()) {
+                throw new IllegalArgumentException("用户名不能为空");
+            }
+        }
+        //集合对象转换
+        List<AuthUser> authUserList = authConvert.toEntityList(authUserDTOList);
+
+        //批量插入数据库
+        int insertBatch = authUserMapper.insertBatch(authUserList);
+
+        // 7. 返回结果（检查是否全部插入成功）
+        return insertBatch == authUserDTOList.size();
+    }
+
+    /**
+     * 用户退出登录
+     *
+     * @param authUserDTO
+     * @return
+     */
+    @Override
+    public Boolean logout(AuthUserDTO authUserDTO) {
+
+        AuthUser authUser = authConvert.toEntity(authUserDTO);
+
+        AuthUser user = authUserMapper.selectByCondition(authUser);
+
+        if (user == null) {
+            throw new RuntimeException("用户不存在,无法继续操作");
+        }
+        StpUtil.logout(user.getId());
+
+        return true;
     }
 
 

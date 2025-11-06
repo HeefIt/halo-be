@@ -1,5 +1,9 @@
 package com.heef.halo.domain.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.annotation.SaIgnore;
+import cn.dev33.satoken.stp.SaTokenInfo;
 import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
@@ -11,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 用户-鉴权模块
@@ -35,6 +42,8 @@ public class AuthController {
      * @param pageSize
      * @return
      */
+
+    @SaCheckLogin
     @GetMapping("/user/selectPage")
     public Result<PageResult<AuthUserDTO>> selectPage(AuthUserDTO authUserDTO,
                                                       @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
@@ -58,6 +67,7 @@ public class AuthController {
      * @param authUserDTO
      * @return
      */
+    @SaIgnore
     @PostMapping("/user/register")
     public Result<AuthUserDTO> register(@RequestBody AuthUserDTO authUserDTO) {
         try {
@@ -77,13 +87,14 @@ public class AuthController {
      * @param authUserDTO
      * @return
      */
+    @SaIgnore
     @PostMapping("/user/login")
-    private Result<Boolean> login(AuthUserDTO authUserDTO) {
+    public Result<SaTokenInfo> login(@RequestBody AuthUserDTO authUserDTO) {
         try {
             Preconditions.checkArgument(!StringUtils.isBlank(authUserDTO.getUserName()), "用户名不能为空!");
             Preconditions.checkArgument(!StringUtils.isBlank(authUserDTO.getPassword()), "密码不能为空!");
-            Boolean result = authService.login(authUserDTO);
-            return Result.ok(result);
+            SaTokenInfo tokenInfo = authService.login(authUserDTO);  // 修改返回类型
+            return Result.ok(tokenInfo);
         } catch (Exception e) {
             log.error("用户登录接口: ", e);
             return Result.fail("登录接口调用错误: " + e.getMessage());
@@ -96,8 +107,10 @@ public class AuthController {
      * @param id
      * @return
      */
+    @SaCheckLogin
+    @SaCheckRole("admin_user")
     @DeleteMapping("/user/delete/{id}")
-    private Result<Boolean> delete(@PathVariable Long id) {
+    public Result<Boolean> delete(@PathVariable Long id) {
         try {
             Boolean result = authService.delete(id);
             return Result.ok(result);
@@ -114,7 +127,7 @@ public class AuthController {
      * @return
      */
     @PutMapping("/user/update/{id}")
-    private Result<Boolean> update(@PathVariable Long id,
+    public Result<Boolean> update(@PathVariable Long id,
                                    @RequestBody AuthUserDTO authUserDTO) {
         try {
             if (log.isInfoEnabled()) {
@@ -135,7 +148,7 @@ public class AuthController {
      * @return
      */
     @GetMapping("/user/queryById/{id}")
-    private Result<AuthUserDTO> queryById(@PathVariable Long id){
+    public Result<AuthUserDTO> queryById(@PathVariable Long id){
         try {
             AuthUserDTO result = authService.queryById(id);
             return Result.ok(result);
@@ -144,6 +157,39 @@ public class AuthController {
             return Result.fail(e.getMessage());
         }
     }
+
+
+    /**
+     * 批量新增用户接口
+     * @param authUserDTOList
+     * @return
+     */
+    @PostMapping("/user/insertBatch")
+    public Result<Boolean> insertBatch(@RequestBody List<AuthUserDTO> authUserDTOList){
+        try {
+            Boolean result = authService.insertBatch(authUserDTOList);
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("批量新增用户接口: ", e);
+            return Result.fail("批量新增用户接口: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 用户退出登录接口
+     * @param authUserDTO
+     * @return
+     */
+    @PostMapping("/user/logout")
+    public Result<Boolean> logout(@RequestBody AuthUserDTO authUserDTO){
+        try{
+            Boolean result = authService.logout(authUserDTO);
+            return Result.ok(result);
+        }catch (Exception e){
+            return Result.fail("用户登出接口: " + e.getMessage());
+        }
+    }
+
 
 
 }

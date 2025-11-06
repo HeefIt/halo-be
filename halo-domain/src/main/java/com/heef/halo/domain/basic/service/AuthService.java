@@ -1,7 +1,10 @@
 package com.heef.halo.domain.basic.service;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
 import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
 import com.heef.halo.result.PageResult;
+
+import java.util.List;
 
 public interface AuthService {
     /**
@@ -25,7 +28,7 @@ public interface AuthService {
      * @param authUserDTO
      * @return
      */
-    Boolean login(AuthUserDTO authUserDTO);
+    SaTokenInfo login(AuthUserDTO authUserDTO);
 
     /**
      * 删除用户
@@ -47,4 +50,18 @@ public interface AuthService {
      * @return
      */
     AuthUserDTO queryById(Long id);
+
+    /**
+     * 批量新增用户
+     * @param authUserDTOList
+     * @return
+     */
+    Boolean insertBatch(List<AuthUserDTO> authUserDTOList);
+
+    /**
+     * 用户退出登录
+     * @param authUserDTO
+     * @return
+     */
+    Boolean logout(AuthUserDTO authUserDTO);
 }

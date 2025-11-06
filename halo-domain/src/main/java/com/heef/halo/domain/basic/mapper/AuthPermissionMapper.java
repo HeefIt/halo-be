@@ -96,4 +96,11 @@ public interface AuthPermissionMapper {
      * @return 是否存在（true:存在, false:不存在）
      */
     Boolean existsById(@Param("id") Long id);
+    
+    /**
+     * 根据用户ID查询权限列表
+     * @param userId 用户ID
+     * @return 权限列表
+     */
+    List<AuthPermission> selectPermissionsByUserId(@Param("userId") Long userId);
 }

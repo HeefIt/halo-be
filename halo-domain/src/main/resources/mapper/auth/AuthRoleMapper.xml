@@ -193,4 +193,15 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 根据用户ID查询角色列表 -->
+    <select id="selectRolesByUserId" resultType="com.heef.halo.domain.basic.entity.AuthRole">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM auth_role ar
+        LEFT JOIN auth_user_role aur ON ar.id = aur.role_id
+        WHERE aur.user_id = #{userId} 
+        AND ar.is_deleted = 0 
+        AND ar.status = 0
+    </select>
+
 </mapper>

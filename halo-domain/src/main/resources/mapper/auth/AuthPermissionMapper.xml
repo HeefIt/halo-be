@@ -269,4 +269,15 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 根据用户ID查询权限列表 -->
+    <select id="selectPermissionsByUserId" resultType="com.heef.halo.domain.basic.entity.AuthPermission">
+        SELECT DISTINCT ap.*
+        FROM auth_permission ap
+        LEFT JOIN auth_role_permission arp ON ap.id = arp.permission_id
+        LEFT JOIN auth_user_role aur ON arp.role_id = aur.role_id
+        WHERE aur.user_id = #{userId}
+        AND ap.is_deleted = 0
+        AND ap.status = 0
+    </select>
+
 </mapper>

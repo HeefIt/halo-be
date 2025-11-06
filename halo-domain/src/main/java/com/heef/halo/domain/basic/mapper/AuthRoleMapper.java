@@ -3,6 +3,7 @@ package com.heef.halo.domain.basic.mapper;
 import com.heef.halo.domain.basic.entity.AuthRole;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -96,4 +97,11 @@ public interface AuthRoleMapper {
      * @return 是否存在（true:存在, false:不存在）
      */
     Boolean existsById(@Param("id") Long id);
+
+    /**
+     * 根据用户ID查询角色列表
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    List<AuthRole> selectRolesByUserId(@Param("userId") Long userId);
 }
