@@ -2,15 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.heef.halo.domain.basic.mapper.AuthUserMapper">
 
-    <!-- 通用查询字段列表 -->
-    <sql id="Base_Column_List">
-        id
-        ,        user_name,        nick_name,        email,        phone,        password,        sex,        avatar,        status,        introduce,        ext_json,        created_by,        created_time,        update_by,        update_time,        is_deleted    </sql>
-
     <!-- 分页查询用户信息表数据 -->
     <select id="selectPage" resultType="com.heef.halo.domain.basic.entity.AuthUser">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_user
         <where>
             <if test="param != null">
@@ -55,7 +50,7 @@
     <!-- 条件查询用户信息表列表 -->
     <select id="selectList" resultType="com.heef.halo.domain.basic.entity.AuthUser">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_user
         <where>
             <if test="param != null">
@@ -115,7 +110,7 @@
     <!-- 根据ID查询用户信息表详情 -->
     <select id="selectById" resultType="com.heef.halo.domain.basic.entity.AuthUser">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_user
         WHERE id = #{id}
     </select>

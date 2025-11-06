@@ -126,6 +126,7 @@ public class AuthController {
      * @param id,authUserDTO
      * @return
      */
+    @SaCheckLogin
     @PutMapping("/user/update/{id}")
     public Result<Boolean> update(@PathVariable Long id,
                                    @RequestBody AuthUserDTO authUserDTO) {
@@ -147,6 +148,7 @@ public class AuthController {
      * @param id
      * @return
      */
+    @SaCheckLogin
     @GetMapping("/user/queryById/{id}")
     public Result<AuthUserDTO> queryById(@PathVariable Long id){
         try {
@@ -164,6 +166,7 @@ public class AuthController {
      * @param authUserDTOList
      * @return
      */
+    @SaCheckLogin
     @PostMapping("/user/insertBatch")
     public Result<Boolean> insertBatch(@RequestBody List<AuthUserDTO> authUserDTOList){
         try {
@@ -180,6 +183,7 @@ public class AuthController {
      * @param authUserDTO
      * @return
      */
+    @SaCheckLogin
     @PostMapping("/user/logout")
     public Result<Boolean> logout(@RequestBody AuthUserDTO authUserDTO){
         try{

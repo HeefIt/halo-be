@@ -19,14 +19,16 @@ import java.util.stream.Collectors;
 
 /**
  * 自定义权限验证接口扩展
- * Sa-Token 将从此实现类获取每个账号拥有的权限码和角色
+ * Sa-Token 将从此实现类获取每个账号拥有的权限码和角色--(使用saToken进行鉴权这个配置很关键)
+ * 目前我这个是基于查询数据库的方式获取角色权限信息---后续可以改进为查询出来存入redis,从redis中获取
+ *
  * @author heefM
  * @date 2025-10-
  */
 @Slf4j
 @Component
 public class StpInterfaceImpl implements StpInterface {
-    
+
     @Autowired
     private AuthUserMapper authUserMapper;
 
@@ -35,8 +37,25 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Autowired
     private AuthPermissionMapper authPermissionMapper;
+
+    /**
+     * 获取角色信息
+     *
+     * @param loginId
+     * @param loginType
+     * @return
+     */
+    @Override
+    public List<String> getRoleList(Object loginId, String loginType) {
+        List<String> roles = getRolesByUserId(Long.valueOf(loginId.toString()));
+        log.info("用户ID: {} 的角色列表: {}", loginId, roles); // 添加日志
+        return roles;
+    }
+
+
     /**
      * 获取权限信息
+     *
      * @param loginId
      * @param loginType
      * @return
@@ -49,18 +68,6 @@ public class StpInterfaceImpl implements StpInterface {
         return permissions;
     }
 
-    /**
-     * 获取角色信息
-     * @param loginId
-     * @param loginType
-     * @return
-     */
-    @Override
-    public List<String> getRoleList(Object loginId, String loginType) {
-        List<String> roles = getRolesByUserId(Long.valueOf(loginId.toString()));
-        log.info("用户ID: {} 的角色列表: {}", loginId, roles); // 添加日志
-        return roles;
-    }
 
     /**
      * 根据用户ID查询角色列表
@@ -68,11 +75,8 @@ public class StpInterfaceImpl implements StpInterface {
     private List<String> getRolesByUserId(Long userId) {
         try {
             List<AuthRole> roleList = authRoleMapper.selectRolesByUserId(userId);
-//            return roleList.stream()
-//                    .map(AuthRole::getRoleKey)
-//                    .collect(Collectors.toList());
             return roleList.stream()
-                    .map(AuthRole::getRoleKey)  // 返回 role_key: "admin_user", "normal_user"
+                    .map(AuthRole::getRoleKey)  // 返回 role_key: "admin_user", "normal_user"(根据数据库的字段)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("查询用户角色列表失败, userId: {}", userId, e);
@@ -86,11 +90,8 @@ public class StpInterfaceImpl implements StpInterface {
     private List<String> getPermissionsByUserId(Long userId) {
         try {
             List<AuthPermission> permissionList = authPermissionMapper.selectPermissionsByUserId(userId);
-//            return permissionList.stream()
-//                    .map(AuthPermission::getName)
-//                    .collect(Collectors.toList());
             return permissionList.stream()
-                    .map(AuthPermission::getPermissionKey)  // ★★★ 重要：改为返回 permission_key
+                    .map(AuthPermission::getPermissionKey)  // ★★★ 重要：返回 permission_key (根据数据库的字段)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("查询用户权限列表失败, userId: {}", userId, e);

@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.service.impl;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -225,13 +226,22 @@ public class AuthServiceImpl implements AuthService {
         // 添加调试日志
         System.out.println("转换后的Entity: " + authUser);
 
-
-        //根据id查询用户是否存在--用户的id不可能被修改
+        // 根据id查询用户是否存在--用户的id不可能被修改
         AuthUser user = authUserMapper.selectById(id);
         if (user == null) {
             throw new RuntimeException("用户不存在!");
         }
-        //修改用户信息
+
+        // 如果不是管理员的话只能修改自己的用户信息
+        if (!StpUtil.hasRole("admin_user")) {
+            // 获取当前登录用户ID
+            Long currentUserId = StpUtil.getLoginIdAsLong();
+            // 如果当前登录用户不是要修改的用户，则抛出异常
+            if (!currentUserId.equals(id)) {
+                throw new RuntimeException("没有权限修改其他用户信息");
+            }
+        }
+        // 修改用户信息
         int updated = authUserMapper.update(authUser);
 
         return updated != 0;

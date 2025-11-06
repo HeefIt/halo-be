@@ -2,15 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.heef.halo.domain.basic.mapper.AuthPermissionMapper">
 
-    <!-- 通用查询字段列表 -->
-    <sql id="Base_Column_List">
-        id
-        ,        name,        parent_id,        type,        menu_url,        status,        show,        icon,        permission_key,        created_by,        created_time,        update_by,        update_time,        is_deleted    </sql>
-
     <!-- 分页查询${tableInfo.comment}数据 -->
     <select id="selectPage" resultType="com.heef.halo.domain.basic.entity.AuthPermission">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, name, parent_id, type, menu_url, status, show, icon, permission_key, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_permission
         <where>
             <if test="param != null">
@@ -67,7 +62,7 @@
     <!-- 条件查询${tableInfo.comment}列表 -->
     <select id="selectList" resultType="com.heef.halo.domain.basic.entity.AuthPermission">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, name, parent_id, type, menu_url, status, show, icon, permission_key, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_permission
         <where>
             <if test="param != null">
@@ -121,7 +116,7 @@
     <!-- 根据ID查询${tableInfo.comment}详情 -->
     <select id="selectById" resultType="com.heef.halo.domain.basic.entity.AuthPermission">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, name, parent_id, type, menu_url, status, show, icon, permission_key, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_permission
         WHERE id = #{id}
     </select>

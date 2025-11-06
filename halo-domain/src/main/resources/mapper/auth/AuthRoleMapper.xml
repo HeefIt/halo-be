@@ -2,15 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.heef.halo.domain.basic.mapper.AuthRoleMapper">
 
-    <!-- 通用查询字段列表 -->
-    <sql id="Base_Column_List">
-        id
-        ,        role_name,        role_key,        created_by,        created_time,        update_by,        update_time,        is_deleted    </sql>
-
     <!-- 分页查询${tableInfo.comment}数据 -->
     <select id="selectPage" resultType="com.heef.halo.domain.basic.entity.AuthRole">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, role_name, role_key, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_role
         <where>
             <if test="param != null">
@@ -49,7 +44,7 @@
     <!-- 条件查询${tableInfo.comment}列表 -->
     <select id="selectList" resultType="com.heef.halo.domain.basic.entity.AuthRole">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, role_name, role_key, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_role
         <where>
             <if test="param != null">
@@ -85,7 +80,7 @@
     <!-- 根据ID查询${tableInfo.comment}详情 -->
     <select id="selectById" resultType="com.heef.halo.domain.basic.entity.AuthRole">
         SELECT
-        <include refid="Base_Column_List"/>
+        id, role_name, role_key, created_by, created_time, update_by, update_time, is_deleted
         FROM auth_role
         WHERE id = #{id}
     </select>
@@ -196,12 +191,11 @@
     <!-- 根据用户ID查询角色列表 -->
     <select id="selectRolesByUserId" resultType="com.heef.halo.domain.basic.entity.AuthRole">
         SELECT
-        <include refid="Base_Column_List"/>
+            ar.id, ar.role_name, ar.role_key, ar.created_by, ar.created_time, ar.update_by, ar.update_time, ar.is_deleted
         FROM auth_role ar
-        LEFT JOIN auth_user_role aur ON ar.id = aur.role_id
-        WHERE aur.user_id = #{userId} 
-        AND ar.is_deleted = 0 
-        AND ar.status = 0
+                 LEFT JOIN auth_user_role aur ON ar.id = aur.role_id
+        WHERE aur.user_id = #{userId}
+          AND ar.is_deleted = 0
     </select>
 
 </mapper>
