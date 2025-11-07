@@ -10,6 +10,12 @@ public class Result<T> {
     private Integer code;
     private T data;
 
+    // 添加setter方法用于链式调用
+    public Result<T> setMessage(String message) {
+        this.message = message;
+        return this;
+    }
+
     public static Result ok() {
         Result result = new Result<>();
         result.setSuccess(true);
