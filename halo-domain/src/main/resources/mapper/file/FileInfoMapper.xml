@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.heef.halo.domain.basic.mapper.FileInfoMapper">
+
+    <resultMap id="FileInfoMap" type="com.heef.halo.domain.basic.entity.FileInfo">
+        <id column="id" property="id"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_path" property="filePath"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="file_type" property="fileType"/>
+        <result column="description" property="description"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="all_columns">
+        id, file_name, file_path, file_size, file_type, description, 
+        created_by, created_time, update_by, update_time, is_deleted
+    </sql>
+
+    <!-- 插入文件信息 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="entity.id">
+        INSERT INTO file_info (
+            file_name, file_path, file_size, file_type, description,
+            created_by, created_time, update_by, update_time, is_deleted
+        ) VALUES (
+            #{entity.fileName}, #{entity.filePath}, #{entity.fileSize}, #{entity.fileType}, #{entity.description},
+            #{entity.createdBy}, #{entity.createdTime}, #{entity.updateBy}, #{entity.updateTime}, #{entity.isDeleted}
+        )
+    </insert>
+
+    <!-- 根据ID查询文件信息 -->
+    <select id="selectById" resultMap="FileInfoMap">
+        SELECT <include refid="all_columns"/>
+        FROM file_info
+        WHERE id = #{id} AND is_deleted = 0
+    </select>
+
+    <!-- 更新文件信息 -->
+    <update id="update">
+        UPDATE file_info
+        <set>
+            <if test="entity.fileName != null and entity.fileName != ''">
+                file_name = #{entity.fileName},
+            </if>
+            <if test="entity.filePath != null and entity.filePath != ''">
+                file_path = #{entity.filePath},
+            </if>
+            <if test="entity.fileSize != null">
+                file_size = #{entity.fileSize},
+            </if>
+            <if test="entity.fileType != null and entity.fileType != ''">
+                file_type = #{entity.fileType},
+            </if>
+            <if test="entity.description != null and entity.description != ''">
+                description = #{entity.description},
+            </if>
+            <if test="entity.createdBy != null and entity.createdBy != ''">
+                created_by = #{entity.createdBy},
+            </if>
+            <if test="entity.createdTime != null">
+                created_time = #{entity.createdTime},
+            </if>
+            <if test="entity.updateBy != null and entity.updateBy != ''">
+                update_by = #{entity.updateBy},
+            </if>
+            <if test="entity.updateTime != null">
+                update_time = #{entity.updateTime},
+            </if>
+            is_deleted = #{entity.isDeleted}
+        </set>
+        WHERE id = #{entity.id}
+    </update>
+
+    <!-- 根据ID删除文件信息（逻辑删除） -->
+    <update id="deleteById">
+        UPDATE file_info
+        SET is_deleted = 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- 分页查询文件信息列表 -->
+    <select id="selectPage" resultMap="FileInfoMap">
+        SELECT <include refid="all_columns"/>
+        FROM file_info
+        WHERE is_deleted = 0
+        ORDER BY created_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 查询文件信息总数 -->
+    <select id="count" resultType="int">
+        SELECT COUNT(*)
+        FROM file_info
+        WHERE is_deleted = 0
+    </select>
+
+</mapper>
