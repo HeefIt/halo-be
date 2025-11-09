@@ -58,10 +58,4 @@ public interface AuthService {
      */
     Boolean insertBatch(List<AuthUserDTO> authUserDTOList);
 
-    /**
-     * 用户退出登录
-     * @param authUserDTO
-     * @return
-     */
-    Boolean logout(AuthUserDTO authUserDTO);
 }

@@ -91,7 +91,7 @@ public class StpInterfaceImpl implements StpInterface {
         try {
             List<AuthPermission> permissionList = authPermissionMapper.selectPermissionsByUserId(userId);
             return permissionList.stream()
-                    .map(AuthPermission::getPermissionKey)  // ★★★ 重要：返回 permission_key (根据数据库的字段)
+                    .map(AuthPermission::getPermissionKey)  // 返回 permission_key (根据数据库的字段)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("查询用户权限列表失败, userId: {}", userId, e);

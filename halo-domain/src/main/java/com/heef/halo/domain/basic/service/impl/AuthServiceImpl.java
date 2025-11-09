@@ -295,6 +295,16 @@ public class AuthServiceImpl implements AuthService {
         //集合对象转换
         List<AuthUser> authUserList = authConvert.toEntityList(authUserDTOList);
 
+        //设置初始化默认信息
+        for (AuthUser authUser : authUserList) {
+            //密码为空就设置默认密码
+            if (StringUtils.isBlank(authUser.getPassword())) {
+                authUser.setPassword("123456");
+            }
+            authUser.setIsDeleted(0);
+            authUser.setStatus(0);
+        }
+
         //批量插入数据库
         int insertBatch = authUserMapper.insertBatch(authUserList);
 
@@ -302,26 +312,6 @@ public class AuthServiceImpl implements AuthService {
         return insertBatch == authUserDTOList.size();
     }
 
-    /**
-     * 用户退出登录
-     *
-     * @param authUserDTO
-     * @return
-     */
-    @Override
-    public Boolean logout(AuthUserDTO authUserDTO) {
-
-        AuthUser authUser = authConvert.toEntity(authUserDTO);
-
-        AuthUser user = authUserMapper.selectByCondition(authUser);
-
-        if (user == null) {
-            throw new RuntimeException("用户不存在,无法继续操作");
-        }
-        StpUtil.logout(user.getId());
-
-        return true;
-    }
 
 
 }

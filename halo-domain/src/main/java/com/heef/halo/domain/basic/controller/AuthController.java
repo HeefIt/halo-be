@@ -1,9 +1,11 @@
 package com.heef.halo.domain.basic.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
@@ -33,36 +35,8 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-
     /**
-     * 分页查询用户列表数据
-     *
-     * @param authUserDTO
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-
-    @SaCheckLogin
-    @GetMapping("/user/selectPage")
-    public Result<PageResult<AuthUserDTO>> selectPage(AuthUserDTO authUserDTO,
-                                                      @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
-                                                      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
-        try {
-            if (log.isInfoEnabled()) {
-                log.info("AuthController.selectPage.dto: {}"
-                        , JSON.toJSONString(authUserDTO));
-            }
-            PageResult<AuthUserDTO> pageResult = authService.selectPage(authUserDTO, pageNum, pageSize);
-            return Result.ok(pageResult);
-        } catch (Exception e) {
-            log.error("用户分页查询列表数据接口: ", e);
-            return Result.fail("分页查询用户列表数据失败: " + e.getMessage());
-        }
-    }
-
-    /**
-     * 用户注册
+     * 用户注册(新增)
      *
      * @param authUserDTO
      * @return
@@ -102,6 +76,69 @@ public class AuthController {
     }
 
     /**
+     * 用户退出登录接口
+     *
+     * @return
+     */
+    @SaCheckLogin
+    @PostMapping("/user/logout")
+    public Result<Boolean> logout() {
+        try {
+            // Sa-Token 会自动从当前会话获取用户信息
+            StpUtil.logout();
+            return Result.ok(true);
+        } catch (Exception e) {
+            log.error("用户退出登录失败: ", e);
+            return Result.fail("退出登录失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 分页查询用户列表数据
+     *
+     * @param authUserDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+
+    @SaCheckLogin
+    @GetMapping("/user/selectPage")
+    public Result<PageResult<AuthUserDTO>> selectPage(AuthUserDTO authUserDTO,
+                                                      @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+                                                      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("AuthController.selectPage.dto: {}"
+                        , JSON.toJSONString(authUserDTO));
+            }
+            PageResult<AuthUserDTO> pageResult = authService.selectPage(authUserDTO, pageNum, pageSize);
+            return Result.ok(pageResult);
+        } catch (Exception e) {
+            log.error("用户分页查询列表数据接口: ", e);
+            return Result.fail("分页查询用户列表数据失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 根据用户id查询用户详情信息
+     *
+     * @param id
+     * @return
+     */
+    @SaCheckLogin
+    @GetMapping("/user/queryById/{id}")
+    public Result<AuthUserDTO> queryById(@PathVariable Long id) {
+        try {
+            AuthUserDTO result = authService.queryById(id);
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("根据用户id查询用户信息接口: ", e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    /**
      * 用户删除
      *
      * @param id
@@ -109,6 +146,7 @@ public class AuthController {
      */
     @SaCheckLogin
     @SaCheckRole("admin_user")
+    @SaCheckPermission("user:delete")
     @DeleteMapping("/user/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         try {
@@ -129,13 +167,13 @@ public class AuthController {
     @SaCheckLogin
     @PutMapping("/user/update/{id}")
     public Result<Boolean> update(@PathVariable Long id,
-                                   @RequestBody AuthUserDTO authUserDTO) {
+                                  @RequestBody AuthUserDTO authUserDTO) {
         try {
             if (log.isInfoEnabled()) {
                 log.info("AuthController.update.dto: {}"
                         , JSON.toJSONString(authUserDTO));
             }
-            Boolean result = authService.update(id,authUserDTO);
+            Boolean result = authService.update(id, authUserDTO);
             return Result.ok(result);
         } catch (Exception e) {
             log.error("用户修改接口: ", e);
@@ -143,32 +181,16 @@ public class AuthController {
         }
     }
 
-    /**
-     * 根据用户id查询用户信息
-     * @param id
-     * @return
-     */
-    @SaCheckLogin
-    @GetMapping("/user/queryById/{id}")
-    public Result<AuthUserDTO> queryById(@PathVariable Long id){
-        try {
-            AuthUserDTO result = authService.queryById(id);
-            return Result.ok(result);
-        } catch (Exception e) {
-            log.error("根据用户id查询用户信息接口: ", e);
-            return Result.fail(e.getMessage());
-        }
-    }
-
 
     /**
      * 批量新增用户接口
+     *
      * @param authUserDTOList
      * @return
      */
     @SaCheckLogin
     @PostMapping("/user/insertBatch")
-    public Result<Boolean> insertBatch(@RequestBody List<AuthUserDTO> authUserDTOList){
+    public Result<Boolean> insertBatch(@RequestBody List<AuthUserDTO> authUserDTOList) {
         try {
             Boolean result = authService.insertBatch(authUserDTOList);
             return Result.ok(result);
@@ -177,23 +199,6 @@ public class AuthController {
             return Result.fail("批量新增用户接口: " + e.getMessage());
         }
     }
-
-    /**
-     * 用户退出登录接口
-     * @param authUserDTO
-     * @return
-     */
-    @SaCheckLogin
-    @PostMapping("/user/logout")
-    public Result<Boolean> logout(@RequestBody AuthUserDTO authUserDTO){
-        try{
-            Boolean result = authService.logout(authUserDTO);
-            return Result.ok(result);
-        }catch (Exception e){
-            return Result.fail("用户登出接口: " + e.getMessage());
-        }
-    }
-
 
 
 }
