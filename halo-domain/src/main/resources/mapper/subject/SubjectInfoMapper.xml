@@ -18,7 +18,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.subjectName != null and param.subjectName != ''">
-                    AND subject_name = #{param.subjectName}
+                    AND subject_name LIKE CONCAT('%', #{param.subjectName},'%')
                 </if>
                 <if test="param.subjectDifficult != null and param.subjectDifficult != ''">
                     AND subject_difficult = #{param.subjectDifficult}
@@ -69,7 +69,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.subjectName != null and param.subjectName != ''">
-                    AND subject_name = #{param.subjectName}
+                    AND subject_name LIKE CONCAT('%', #{param.subjectName},'%')
                 </if>
                 <if test="param.subjectDifficult != null and param.subjectDifficult != ''">
                     AND subject_difficult = #{param.subjectDifficult}
@@ -202,7 +202,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.subjectName != null and param.subjectName != ''">
-                    AND subject_name = #{param.subjectName}
+                    AND subject_name LIKE CONCAT('%', #{param.subjectName},'%')
                 </if>
                 <if test="param.subjectDifficult != null and param.subjectDifficult != ''">
                     AND subject_difficult = #{param.subjectDifficult}

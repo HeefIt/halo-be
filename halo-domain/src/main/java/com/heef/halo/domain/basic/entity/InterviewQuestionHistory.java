@@ -3,6 +3,8 @@ package com.heef.halo.domain.basic.entity;
 import java.util.Date;
 import java.io.Serializable;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -33,12 +35,16 @@ public class InterviewQuestionHistory implements Serializable {
 
     private String userAnswer;
 
+    @TableField(fill = FieldFill.INSERT)
     private String createdBy;
 
+    @TableField(fill = FieldFill.INSERT)
     private Date createdTime;
 
+    @TableField(fill = FieldFill.UPDATE)
     private String updateBy;
 
+    @TableField(fill = FieldFill.UPDATE)
     private Date updateTime;
 
     private Integer isDeleted;
