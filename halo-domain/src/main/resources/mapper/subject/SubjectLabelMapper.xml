@@ -18,7 +18,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.labelName != null and param.labelName != ''">
-                    AND label_name = #{param.labelName}
+                    AND label_name LIKE CONCAT('%',#{param.labelName},'%')
                 </if>
                 <if test="param.sortNum != null and param.sortNum != ''">
                     AND sort_num = #{param.sortNum}
@@ -60,7 +60,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.labelName != null and param.labelName != ''">
-                    AND label_name = #{param.labelName}
+                    AND label_name LIKE CONCAT('%',#{param.labelName},'%')
                 </if>
                 <if test="param.sortNum != null and param.sortNum != ''">
                     AND sort_num = #{param.sortNum}
