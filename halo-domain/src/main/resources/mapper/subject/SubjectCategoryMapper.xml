@@ -18,7 +18,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.categoryName != null and param.categoryName != ''">
-                    AND category_name = #{param.categoryName}
+                    AND category_name LIKE CONCAT('%', #{param.categoryName}, '%')
                 </if>
                 <if test="param.categoryType != null and param.categoryType != ''">
                     AND category_type = #{param.categoryType}
@@ -63,7 +63,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.categoryName != null and param.categoryName != ''">
-                    AND category_name = #{param.categoryName}
+                    AND category_name LIKE CONCAT('%', #{param.categoryName}, '%')
                 </if>
                 <if test="param.categoryType != null and param.categoryType != ''">
                     AND category_type = #{param.categoryType}
@@ -183,7 +183,7 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.categoryName != null and param.categoryName != ''">
-                    AND category_name = #{param.categoryName}
+                    AND category_name LIKE CONCAT('%', #{param.categoryName}, '%')
                 </if>
                 <if test="param.categoryType != null and param.categoryType != ''">
                     AND category_type = #{param.categoryType}
