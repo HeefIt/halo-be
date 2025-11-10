@@ -17,6 +17,7 @@ import com.heef.halo.domain.convert.AuthConvert;
 import com.heef.halo.result.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,9 @@ public class AuthServiceImpl implements AuthService {
 
         //3.查询当前页列表数据
         List<AuthUser> userList = authUserMapper.selectPage(authUser, offset, pageSize);
+//        if(userList.isEmpty()){
+//            throw new RuntimeException("用户数据不存在");
+//        }
 
         //4.查询表中总数据
         Long total = authUserMapper.count(authUser);
@@ -312,6 +316,57 @@ public class AuthServiceImpl implements AuthService {
         return insertBatch == authUserDTOList.size();
     }
 
+    /**
+     * 用户状态设置
+     *
+     * @param id
+     * @param status
+     * @return
+     */
+    @Override
+    public Boolean setStatus(Long id, Integer status) {
+        AuthUser authUser = new AuthUser();
+        authUser.setId(id);
+        authUser.setStatus(status);
+        Boolean result = authUserMapper.setStatus(id, status);
+        return result;
+    }
+
+    /**
+     * 分配用户-角色信息
+     *
+     * @param userId 用户id
+     * @param roleId 角色id
+     * @return
+     */
+    @Override
+    public Boolean assignRole(Long userId, Long roleId) {
+        //查询用户
+        AuthUser authUser = authUserMapper.selectById(userId);
+        if(authUser==null){
+            throw new RuntimeException("用户信息不存在");
+        }
+        //查询角色
+        AuthRole authRole = authRoleMapper.selectById(roleId);
+        if(authRole==null){
+            throw new RuntimeException("角色信息不存在");
+        }
+        // 检查是否已分配该角色
+        LambdaQueryWrapper<AuthUserRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(AuthUserRole::getUserId, userId)
+                .eq(AuthUserRole::getRoleId, roleId);
+        Long existing = authUserRoleMapper.selectCount(queryWrapper);
+
+        if (existing>0) {
+            throw new RuntimeException("用户已拥有该角色，无需重复分配");
+        }
+
+        AuthUserRole authUserRole = new AuthUserRole();
+        authUserRole.setUserId(userId);
+        authUserRole.setRoleId(roleId);
+        int inserted = authUserRoleMapper.insert(authUserRole);
+        return inserted != 0;
+    }
 
 
 }

@@ -58,4 +58,19 @@ public interface AuthService {
      */
     Boolean insertBatch(List<AuthUserDTO> authUserDTOList);
 
+    /**
+     * 用户状态设置
+     * @param id
+     * @param status
+     * @return
+     */
+    Boolean setStatus(Long id, Integer status);
+
+    /**
+     * 分配用户角色信息
+     * @param userId
+     * @param roleId
+     * @return
+     */
+    Boolean assignRole(Long userId, Long roleId);
 }

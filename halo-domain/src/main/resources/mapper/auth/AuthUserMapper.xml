@@ -191,6 +191,7 @@
         WHERE id = #{entity.id}
     </update>
 
+
     <!-- 根据ID删除用户信息表数据 -->
     <delete id="deleteById">
         DELETE
@@ -216,16 +217,16 @@
                     AND id = #{param.id}
                 </if>
                 <if test="param.userName != null and param.userName != ''">
-                    AND user_name = #{param.userName}
+                    AND user_name LIKE CONCAT('%', #{param.userName}, '%')
                 </if>
                 <if test="param.nickName != null and param.nickName != ''">
-                    AND nick_name = #{param.nickName}
+                    AND nick_name LIKE CONCAT('%', #{param.nickName}, '%')
                 </if>
                 <if test="param.email != null and param.email != ''">
-                    AND email = #{param.email}
+                    AND email LIKE CONCAT('%', #{param.email}, '%')
                 </if>
                 <if test="param.phone != null and param.phone != ''">
-                    AND phone = #{param.phone}
+                    AND phone LIKE CONCAT('%', #{param.phone}, '%')
                 </if>
                 <if test="param.password != null and param.password != ''">
                     AND password = #{param.password}
@@ -337,5 +338,16 @@
             </if>
         </where>
     </select>
+
+    <!--设置用户状态-->
+    <update id="setStatus" >
+        update auth_user
+        <set>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+            where id=#{id}
+    </update>
 
 </mapper>

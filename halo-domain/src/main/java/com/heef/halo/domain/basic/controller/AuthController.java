@@ -113,6 +113,10 @@ public class AuthController {
                         , JSON.toJSONString(authUserDTO));
             }
             PageResult<AuthUserDTO> pageResult = authService.selectPage(authUserDTO, pageNum, pageSize);
+            if (log.isInfoEnabled()) {
+                log.info("用户查询结果: {}"
+                        , JSON.toJSONString(pageResult));
+            }
             return Result.ok(pageResult);
         } catch (Exception e) {
             log.error("用户分页查询列表数据接口: ", e);
@@ -189,6 +193,7 @@ public class AuthController {
      * @return
      */
     @SaCheckLogin
+    @SaCheckRole("admin_user")
     @PostMapping("/user/insertBatch")
     public Result<Boolean> insertBatch(@RequestBody List<AuthUserDTO> authUserDTOList) {
         try {
@@ -200,5 +205,80 @@ public class AuthController {
         }
     }
 
+    /**
+     * 用户状态设置
+     *
+     * @param id
+     * @param status
+     * @return
+     */
+//    @SaCheckLogin
+//    @SaCheckRole("admin_user")
+    @PostMapping("/user/status")
+    public Result<Boolean> setStatus(@RequestParam Long id, @RequestParam Integer status) {
+        try {
+            Boolean result = authService.setStatus(id, status);
+            return Result.ok(result);
+        } catch (Exception e) {
+            return Result.fail("用户状态设置失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 踢出用户下线
+     *
+     * @param id
+     * @return
+     */
+    @SaCheckLogin
+    @SaCheckRole("admin_user")
+    @PostMapping("/user/kickout")
+    public Result<Boolean> kickOut(@RequestParam Long id) {
+        try {
+            StpUtil.kickout(id);
+            log.info("踢出用户下线:{}", id);
+            return Result.ok("踢出用户下线成功");
+        } catch (Exception e) {
+            return Result.fail("踢出用户下线失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 检查用户是否登录
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping("/user/isLogin")
+    public Result<Boolean> isLogin(@RequestParam Long id) {
+        try {
+            boolean result = StpUtil.isLogin(id);
+            log.info("检查用户是否登录:{}", id);
+            return Result.ok("检查用户是否登录-结果是:" + result);
+        } catch (Exception e) {
+            return Result.fail("检查用户是否登录: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 分配用户-角色信息
+     *
+     * @param userId
+     * @param roleId
+     * @return
+     */
+    @SaCheckLogin
+    @SaCheckRole("admin_user")
+    @PostMapping("/user/setRole")
+    public Result<Boolean> assignRole(@RequestParam Long userId, @RequestParam Long roleId) {
+        try {
+            Boolean result = authService.assignRole(userId, roleId);
+            return Result.ok("分配用户-角色信息-结果是:" + result);
+        } catch (Exception e) {
+            log.error("分配用户-角色信息失败", e);
+            return Result.fail("分配用户-角色信息失败: " + e.getMessage());
+        }
+    }
 
 }

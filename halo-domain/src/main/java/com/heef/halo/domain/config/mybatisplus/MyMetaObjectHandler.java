@@ -11,6 +11,17 @@ import java.util.Date;
  * MyBatis Plus字段自动填充配置类
  * 用于自动填充创建时间和更新时间等字段
  */
+/**
+ * MyBatis Plus字段自动填充配置类
+ * 用于自动填充创建时间和更新时间等字段---要使其生效需要在对应的实体类上加注解@TableField(fill= 1~2~3~4)
+ * 1: FieldFill.INSERT	仅在插入时填充
+ * 2: FieldFill.UPDATE	仅在更新时填充
+ * 3: FieldFill.INSERT_UPDATE	插入和更新时都填充
+ * 4: FieldFill.DEFAULT	不填充
+ *
+ * @author heefM
+ * @date 2025-
+ */
 @Slf4j
 @Component
 public class MyMetaObjectHandler implements MetaObjectHandler {

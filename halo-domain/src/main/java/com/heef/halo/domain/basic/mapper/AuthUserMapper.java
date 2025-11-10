@@ -113,4 +113,12 @@ public interface AuthUserMapper extends BaseMapper<AuthUser> {
      * @return
      */
     AuthUser selectByUserName(String userName);
+
+    /**
+     * 设置用户状态
+     * @param id
+     * @param status
+     * @return
+     */
+    Boolean setStatus(Long id, Integer status);
 }
