@@ -25,7 +25,7 @@ public class SubjectBriefDTO implements Serializable {
     /**
      * 题目id
      */
-    private Integer subjectId;
+    private Long subjectId;
     /**
      * 题目答案
      */

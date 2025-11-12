@@ -3,8 +3,8 @@ package com.heef.halo.domain.basic.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson.JSON;
-import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
 import com.heef.halo.domain.basic.service.SubjectService;
 import com.heef.halo.result.PageResult;
@@ -12,8 +12,6 @@ import com.heef.halo.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * subject-题目控制层
@@ -90,7 +88,6 @@ public class SubjectController {
      * @param subjectCategoryDTO
      * @return
      */
-    @SaCheckLogin
     @PutMapping("/category/update/{id}")
     public Result<Boolean> update(@PathVariable Long id, @RequestBody SubjectCategoryDTO subjectCategoryDTO) {
         try {
@@ -110,10 +107,8 @@ public class SubjectController {
      * 删除分类
      *
      * @param id
-     * @param
      * @return
      */
-    @SaCheckLogin
     @DeleteMapping("/category/delete/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         try {
@@ -121,38 +116,12 @@ public class SubjectController {
                 log.info("SubjectController.delete.dto: {}", id);
             }
             Boolean result = subjectService.delete(id);
-            return Result.ok("删除分类结果为:" + result);
+            return Result.ok(result);
         } catch (Exception e) {
             log.error("删除分类失败:", e);
-            return Result.fail("失败:" + e.getMessage());
+            return Result.fail("删除分类失败:" + e.getMessage());
         }
     }
-
-    /**
-     * 查询大分类下的二级分类
-     *
-     * @param subjectCategoryDTO
-     * @return
-     */
-    @SaCheckLogin
-    @PostMapping("/category/selectCategoryByPrimary")
-    public Result<List<SubjectCategoryDTO>> selectCategoryByPrimary(@RequestBody SubjectCategoryDTO subjectCategoryDTO) {
-        return Result.ok();
-    }
-
-
-    /**
-     * 一次性查询分类以及二级分类和标签
-     *
-     * @param subjectCategoryDTO
-     * @return
-     */
-    @SaCheckLogin
-    @PostMapping("/category/selectCategoryAndLabel")
-    public Result<List<SubjectCategoryDTO>> selectCategoryAndLabel(@RequestBody SubjectCategoryDTO subjectCategoryDTO) {
-        return Result.ok();
-    }
-
 
     /**
      * 新增题目标签
@@ -186,7 +155,7 @@ public class SubjectController {
 
     @SaCheckLogin
     @GetMapping("/label/selectPage")
-    public Result<PageResult<SubjectCategoryDTO>> selectPageLabel(SubjectLabelDTO subjectLabelDTO,
+    public Result<PageResult<SubjectLabelDTO>> selectPageLabel(SubjectLabelDTO subjectLabelDTO,
                                                                   @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
                                                                   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         try {
@@ -242,7 +211,7 @@ public class SubjectController {
     public Result<Boolean> deleteLabel(@PathVariable Long id) {
         try {
             if (log.isInfoEnabled()) {
-                log.info("SubjectController.deleteLabel.dto: {}", id);
+                log.info("SubjectController.deleteLabel: {}", id);
             }
             Boolean result = subjectService.deleteLabel(id);
             return Result.ok("删除标签结果为:" + result);
@@ -251,4 +220,26 @@ public class SubjectController {
             return Result.fail("删除标签失败:" + e.getMessage());
         }
     }
+
+
+    /**
+     * 新增题目
+     * @param subjectInfoDTO
+     * @return
+     */
+    @PostMapping("/info/add")
+    public Result<Boolean> addSubject(@RequestBody SubjectInfoDTO subjectInfoDTO){
+        try{
+            if(log.isInfoEnabled()){
+                log.info("SubjectController.addSubject.subjectInfoDTO: {}", JSON.toJSONString(subjectInfoDTO));
+            }
+            Boolean result = subjectService.addSubject(subjectInfoDTO);
+            return Result.ok("新增题目结果为:" + result);
+        }catch (Exception e){
+            log.error("新增题目失败:", e);
+            return Result.fail("新增题目失败:" + e.getMessage());
+        }
+    }
+
+
 }

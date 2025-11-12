@@ -3,20 +3,25 @@ package com.heef.halo.domain.basic.service.impl;
 import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectBriefDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
-import com.heef.halo.domain.basic.entity.AuthUser;
-import com.heef.halo.domain.basic.entity.SubjectCategory;
-import com.heef.halo.domain.basic.entity.SubjectLabel;
+import com.heef.halo.domain.basic.entity.*;
+import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandler;
+import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandlerFactory;
 import com.heef.halo.domain.basic.mapper.*;
 import com.heef.halo.domain.basic.service.ShareService;
 import com.heef.halo.domain.basic.service.SubjectService;
 import com.heef.halo.domain.convert.SubjectCategoryConvert;
+import com.heef.halo.domain.convert.SubjectInfoConvert;
 import com.heef.halo.domain.convert.SubjectLabelConvert;
+import com.heef.halo.enums.IsDeleteFlagEnum;
 import com.heef.halo.result.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -53,12 +58,20 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Autowired
     private SubjectBriefMapper subjectBriefMapper;
+    @Autowired
+    private SubjectMappingMapper subjectMappingMapper;
+
+    @Autowired
+    private SubjectTypeHandlerFactory subjectTypeHandlerFactory;
 
     @Autowired
     private SubjectCategoryConvert subjectCategoryConvert;
 
     @Autowired
     private SubjectLabelConvert subjectLabelConvert;
+
+    @Autowired
+    private SubjectInfoConvert subjectInfoConvert;
 
 
     /**
@@ -149,7 +162,6 @@ public class SubjectServiceImpl implements SubjectService {
         return deleted != 0;
     }
 
-
     /**
      * 新增题目标签
      *
@@ -160,20 +172,6 @@ public class SubjectServiceImpl implements SubjectService {
     public Boolean addLabel(SubjectLabelDTO subjectLabelDTO) {
         if (subjectLabelDTO == null) {
             throw new RuntimeException("标签数据不能为空");
-        }
-
-        // 必填字段校验
-        if (subjectLabelDTO.getCategoryId() == null) {
-            throw new RuntimeException("分类ID不能为空");
-        }
-        if (StringUtils.isBlank(subjectLabelDTO.getLabelName())) {
-            throw new RuntimeException("标签名称不能为空");
-        }
-
-        // 校验分类是否存在
-        SubjectCategory category = subjectCategoryMapper.selectById(Long.valueOf(subjectLabelDTO.getCategoryId()));
-        if (category == null) {
-            throw new RuntimeException("选择的分类不存在");
         }
         SubjectLabel subjectLabel = subjectLabelConvert.toLabelEntity(subjectLabelDTO);
         subjectLabel.setIsDeleted(0);
@@ -251,4 +249,118 @@ public class SubjectServiceImpl implements SubjectService {
         int deleted = subjectLabelMapper.deleteById(id);
         return deleted != 0;
     }
+
+    /**
+     * 新增题目
+     *
+     * @param subjectInfoDTO
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean addSubject(SubjectInfoDTO subjectInfoDTO) {
+        //1.校验
+        if (subjectInfoDTO == null) {
+            throw new RuntimeException("题目信息不能为空");
+        }
+        //2.对象转换
+        SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+
+        //3.插入数据到题目info总主表
+        int inserted = subjectInfoMapper.insert(subjectInfo);
+
+        //4.使用策略工厂处理不同题型插入
+        SubjectTypeHandler subjectTypeHandler =subjectTypeHandlerFactory.getHandler(subjectInfoDTO.getSubjectType());
+        subjectInfoDTO.setId(Math.toIntExact(subjectInfo.getId()));// 解决题目id没有插入到对应题目类型表的subjectId的问题
+        subjectTypeHandler.addSubject(subjectInfo.getId(),subjectInfoDTO);
+
+        //5.获取插入数据的id,来同步到从表(关联表)mapping
+        Long subjectInfoId = subjectInfo.getId();
+
+        //6.在mapping处理分类关联
+        List<Integer> categoryIds = subjectInfoDTO.getCategoryIds();
+        if (!CollectionUtils.isEmpty(categoryIds)) {
+            for (Integer categoryId : categoryIds) {
+                SubjectMapping subjectMapping = new SubjectMapping();
+                subjectMapping.setSubjectId(subjectInfoId);
+                subjectMapping.setCategoryId(Long.valueOf(categoryId));
+                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+                subjectMappingMapper.insert(subjectMapping);
+            }
+        }
+        //7.在mapping处理标签关联
+        List<Integer> labelIds = subjectInfoDTO.getLabelIds();
+        if (!CollectionUtils.isEmpty(labelIds)) {
+            for (Integer labelId : labelIds) {
+                SubjectMapping subjectMapping = new SubjectMapping();
+                subjectMapping.setSubjectId(subjectInfoId);
+                subjectMapping.setLabelId(Long.valueOf(labelId));
+                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+                subjectMappingMapper.insert(subjectMapping);
+            }
+        }
+
+        return inserted!=0;
+    }
+
+
+//    /**
+//     * 新增题目
+//     *
+//     * @param subjectInfoDTO
+//     * @return
+//     */
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    public Boolean addSubject(SubjectInfoDTO subjectInfoDTO) {
+//        //1.参数校验
+//        if (subjectInfoDTO == null) {
+//            throw new RuntimeException("题目信息不能为空");
+//        }
+//
+//        //2.dto转entity
+//        SubjectInfo subjectInfo = new SubjectInfo();
+//        subjectInfo.setSubjectName(subjectInfoDTO.getSubjectName());
+//        subjectInfo.setSubjectDifficult(subjectInfoDTO.getSubjectDifficult());
+//        subjectInfo.setSettleName(subjectInfoDTO.getSettleName());
+//        subjectInfo.setSubjectType(subjectInfoDTO.getSubjectType());
+//        subjectInfo.setSubjectScore(subjectInfoDTO.getSubjectScore());
+//        subjectInfo.setSubjectParse(subjectInfoDTO.getSubjectParse());
+//        subjectInfo.setSubjectAnswer(subjectInfoDTO.getSubjectAnswer());
+//        subjectInfo.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+//
+//        //3.插入题目信息
+//        subjectInfoMapper.insert(subjectInfo);
+//
+//        //4.获取题目id
+//        Long subjectId = subjectInfo.getId();
+//
+//        //5.处理分类和标签关联
+//        List<Integer> categoryIds = subjectInfoDTO.getCategoryIds();
+//        if (!CollectionUtils.isEmpty(categoryIds)) {
+//            for (Integer categoryId : categoryIds) {
+//                SubjectMapping subjectMapping = new SubjectMapping();
+//                subjectMapping.setSubjectId(subjectId);
+//                subjectMapping.setCategoryId(Long.valueOf(categoryId));
+//                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+//                subjectMappingMapper.insert(subjectMapping);
+//            }
+//        }
+//
+//        List<Integer> labelIds = subjectInfoDTO.getLabelIds();
+//        if (!CollectionUtils.isEmpty(labelIds)) {
+//            for (Integer labelId : labelIds) {
+//                SubjectMapping subjectMapping = new SubjectMapping();
+//                subjectMapping.setSubjectId(subjectId);
+//                subjectMapping.setLabelId(Long.valueOf(labelId));
+//                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+//                subjectMappingMapper.insert(subjectMapping);
+//            }
+//        }
+//
+//        //6.使用策略工厂处理不同题型
+//        subjectTypeHandlerFactory.getHandler(subjectInfoDTO.getSubjectType()).add(subjectInfo);
+//
+//        return true;
+//    }
 }

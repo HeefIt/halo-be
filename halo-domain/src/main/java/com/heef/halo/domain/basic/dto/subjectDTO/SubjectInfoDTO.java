@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 题目信息表(SubjectInfo)实体类
@@ -21,7 +22,7 @@ public class SubjectInfoDTO implements Serializable {
     /**
      * 主键
      */
-    private Long id;
+    private Integer id;
     /**
      * 题目名称
      */
@@ -47,22 +48,37 @@ public class SubjectInfoDTO implements Serializable {
      */
     private String subjectParse;
     /**
-     * 创建人
+     * 题目答案
      */
-    private String createdBy;
-    /**
-     * 创建时间
-     */
-    private Date createdTime;
-    /**
-     * 修改人
-     */
-    private String updateBy;
-    /**
-     * 修改时间
-     */
-    private Date updateTime;
+    private String subjectAnswer;
 
-    private Integer isDeleted;
+    /**
+     * 分类id
+     */
+    private List<Integer> categoryIds;
 
+    /**
+     * 标签id
+     */
+    private List<Integer> labelIds;
+
+    /**
+     * 选择题的答案选项 如a,b,c,d
+     */
+    private List<SubjectAnswerDTO> optionList;
+
+    /**
+     * 分类id
+     */
+    private Integer categoryId;
+
+    /**
+     * 标签id
+     */
+    private Integer labelId;
+
+    /**
+     * 标签名字
+     */
+    private List<String> labelName;
 }

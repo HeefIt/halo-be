@@ -1,9 +1,8 @@
 package com.heef.halo.domain.convert;
 
+
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
 import com.heef.halo.domain.basic.entity.SubjectCategory;
-import com.heef.halo.domain.basic.entity.SubjectLabel;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -30,6 +29,6 @@ public interface SubjectCategoryConvert {
 
     //entityList-->dtoList
     List<SubjectCategoryDTO> toDtoList(List<SubjectCategory> subjectCategoryList);
-    
+
 
 }

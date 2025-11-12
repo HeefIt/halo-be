@@ -1,7 +1,7 @@
 package com.heef.halo.domain.basic.service;
 
-import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
 import com.heef.halo.result.PageResult;
 
@@ -37,20 +37,6 @@ public interface SubjectService {
      */
     Boolean delete(Long id);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * 新增题目标签
      * @param subjectLabelDTO
@@ -81,4 +67,11 @@ public interface SubjectService {
      * @return
      */
     Boolean deleteLabel(Long id);
+
+    /**
+     * 新增题目
+     * @param subjectInfoDTO
+     * @return
+     */
+    Boolean addSubject(SubjectInfoDTO subjectInfoDTO);
 }
