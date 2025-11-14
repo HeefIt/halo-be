@@ -2,66 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.heef.halo.domain.basic.mapper.SubjectInfoMapper">
 
-    <!-- 通用查询字段列表 -->
-    <sql id="Base_Column_List">
-        id
-        ,        subject_name,        subject_difficult,        settle_name,        subject_type,        subject_score,        subject_parse,        created_by,        created_time,        update_by,        update_time,        is_deleted    </sql>
+<!--    &lt;!&ndash; 通用查询字段列表 &ndash;&gt;-->
+<!--    <sql id="Base_Column_List">-->
+<!--        id-->
+<!--        ,        subject_name,        subject_difficult,        settle_name,        subject_type,        subject_score,        subject_parse,        created_by,        created_time,        update_by,        update_time,        is_deleted    </sql>-->
 
-    <!-- 分页查询题目信息表数据 -->
-    <select id="selectPage" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM subject_info
-        <where>
-            <if test="param != null">
-                <if test="param.id != null and param.id != ''">
-                    AND id = #{param.id}
-                </if>
-                <if test="param.subjectName != null and param.subjectName != ''">
-                    AND subject_name LIKE CONCAT('%', #{param.subjectName},'%')
-                </if>
-                <if test="param.subjectDifficult != null and param.subjectDifficult != ''">
-                    AND subject_difficult = #{param.subjectDifficult}
-                </if>
-                <if test="param.settleName != null and param.settleName != ''">
-                    AND settle_name = #{param.settleName}
-                </if>
-                <if test="param.subjectType != null and param.subjectType != ''">
-                    AND subject_type = #{param.subjectType}
-                </if>
-                <if test="param.subjectScore != null and param.subjectScore != ''">
-                    AND subject_score = #{param.subjectScore}
-                </if>
-                <if test="param.subjectParse != null and param.subjectParse != ''">
-                    AND subject_parse = #{param.subjectParse}
-                </if>
-                <if test="param.createdBy != null and param.createdBy != ''">
-                    AND created_by = #{param.createdBy}
-                </if>
-                <if test="param.createdTime != null and param.createdTime != ''">
-                    AND created_time = #{param.createdTime}
-                </if>
-                <if test="param.updateBy != null and param.updateBy != ''">
-                    AND update_by = #{param.updateBy}
-                </if>
-                <if test="param.updateTime != null and param.updateTime != ''">
-                    AND update_time = #{param.updateTime}
-                </if>
-                <if test="param.isDeleted != null and param.isDeleted != ''">
-                    AND is_deleted = #{param.isDeleted}
-                </if>
-            </if>
-        </where>
-        ORDER BY id DESC
-        <if test="offset != null and limit != null">
-            LIMIT #{offset}, #{limit}
-        </if>
-    </select>
 
     <!-- 条件查询题目信息表列表 -->
     <select id="selectList" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
-        SELECT
-        <include refid="Base_Column_List"/>
+        SELECT *
         FROM subject_info
         <where>
             <if test="param != null">
@@ -108,8 +57,7 @@
 
     <!-- 根据ID查询题目信息表详情 -->
     <select id="selectById" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
-        SELECT
-        <include refid="Base_Column_List"/>
+        SELECT *
         FROM subject_info
         WHERE id = #{id}
     </select>
@@ -193,6 +141,58 @@
         </foreach>
     </delete>
 
+
+
+    <!-- 单表?分页查询题目信息表数据 不支持分类/标签查询 -->
+    <select id="selectPage" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
+        SELECT *
+        FROM subject_info
+        <where>
+            <if test="param != null">
+                <if test="param.id != null and param.id != ''">
+                    AND id = #{param.id}
+                </if>
+                <if test="param.subjectName != null and param.subjectName != ''">
+                    AND subject_name LIKE CONCAT('%', #{param.subjectName},'%')
+                </if>
+                <if test="param.subjectDifficult != null and param.subjectDifficult != ''">
+                    AND subject_difficult = #{param.subjectDifficult}
+                </if>
+                <if test="param.settleName != null and param.settleName != ''">
+                    AND settle_name = #{param.settleName}
+                </if>
+                <if test="param.subjectType != null and param.subjectType != ''">
+                    AND subject_type = #{param.subjectType}
+                </if>
+                <if test="param.subjectScore != null and param.subjectScore != ''">
+                    AND subject_score = #{param.subjectScore}
+                </if>
+                <if test="param.subjectParse != null and param.subjectParse != ''">
+                    AND subject_parse = #{param.subjectParse}
+                </if>
+                <if test="param.createdBy != null and param.createdBy != ''">
+                    AND created_by = #{param.createdBy}
+                </if>
+                <if test="param.createdTime != null and param.createdTime != ''">
+                    AND created_time = #{param.createdTime}
+                </if>
+                <if test="param.updateBy != null and param.updateBy != ''">
+                    AND update_by = #{param.updateBy}
+                </if>
+                <if test="param.updateTime != null and param.updateTime != ''">
+                    AND update_time = #{param.updateTime}
+                </if>
+                <if test="param.isDeleted != null and param.isDeleted != ''">
+                    AND is_deleted = #{param.isDeleted}
+                </if>
+            </if>
+        </where>
+        ORDER BY id DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
     <!-- 统计题目信息表数据数量 -->
     <select id="count" resultType="java.lang.Long">
         SELECT COUNT(*) FROM subject_info
@@ -238,11 +238,118 @@
         </where>
     </select>
 
+
+
+
+
     <!-- 根据ID判断题目信息表是否存在 -->
     <select id="existsById" resultType="java.lang.Boolean">
         SELECT COUNT(*) > 0
         FROM subject_info
         WHERE id = #{id}
+    </select>
+
+    <!--条件查询指定行数据-->
+    <select id="queryByCondition" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
+        SELECT *
+        FROM subject_info
+        <where>
+            <if test="param != null">
+                <if test="param.id != null and param.id != ''">
+                    AND id = #{param.id}
+                </if>
+                <if test="param.subjectName != null and param.subjectName != ''">
+                    AND subject_name LIKE CONCAT('%', #{param.subjectName},'%')
+                </if>
+                <if test="param.subjectDifficult != null and param.subjectDifficult != ''">
+                    AND subject_difficult = #{param.subjectDifficult}
+                </if>
+                <if test="param.settleName != null and param.settleName != ''">
+                    AND settle_name = #{param.settleName}
+                </if>
+                <if test="param.subjectType != null and param.subjectType != ''">
+                    AND subject_type = #{param.subjectType}
+                </if>
+                <if test="param.subjectScore != null and param.subjectScore != ''">
+                    AND subject_score = #{param.subjectScore}
+                </if>
+                <if test="param.subjectParse != null and param.subjectParse != ''">
+                    AND subject_parse = #{param.subjectParse}
+                </if>
+                <if test="param.createdBy != null and param.createdBy != ''">
+                    AND created_by = #{param.createdBy}
+                </if>
+                <if test="param.createdTime != null and param.createdTime != ''">
+                    AND created_time = #{param.createdTime}
+                </if>
+                <if test="param.updateBy != null and param.updateBy != ''">
+                    AND update_by = #{param.updateBy}
+                </if>
+                <if test="param.updateTime != null and param.updateTime != ''">
+                    AND update_time = #{param.updateTime}
+                </if>
+                <if test="param.isDeleted != null and param.isDeleted != ''">
+                    AND is_deleted = #{param.isDeleted}
+                </if>
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <!--条件多表查询当前页题目数据-->
+    <select id="selectPage2" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
+        SELECT DISTINCT si.*
+        FROM subject_info si
+        LEFT JOIN subject_mapping sm ON si.id = sm.subject_id AND sm.is_deleted = 0
+        <where>
+            si.is_deleted = 0
+            <if test="subjectInfo != null">
+                <if test="subjectInfo.subjectName != null and subjectInfo.subjectName != ''">
+                    AND si.subject_name LIKE CONCAT('%', #{subjectInfo.subjectName}, '%')
+                </if>
+                <if test="subjectInfo.subjectDifficult != null">
+                    AND si.subject_difficult = #{subjectInfo.subjectDifficult}
+                </if>
+                <if test="subjectInfo.subjectType != null">
+                    AND si.subject_type = #{subjectInfo.subjectType}
+                </if>
+            </if>
+            <if test="categoryId != null and categoryId != -1">
+                AND sm.category_id = #{categoryId}
+            </if>
+            <if test="labelId != null and labelId != -1">
+                AND sm.label_id = #{labelId}
+            </if>
+        </where>
+        ORDER BY si.id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!--条件多表统计题目数据总数-->
+    <select id="count2" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT si.id)
+        FROM subject_info si
+        LEFT JOIN subject_mapping sm ON si.id = sm.subject_id AND sm.is_deleted = 0
+        <where>
+            si.is_deleted = 0
+            <if test="subjectInfo != null">
+                <if test="subjectInfo.subjectName != null and subjectInfo.subjectName != ''">
+                    AND si.subject_name LIKE CONCAT('%', #{subjectInfo.subjectName}, '%')
+                </if>
+                <if test="subjectInfo.subjectDifficult != null">
+                    AND si.subject_difficult = #{subjectInfo.subjectDifficult}
+                </if>
+                <if test="subjectInfo.subjectType != null">
+                    AND si.subject_type = #{subjectInfo.subjectType}
+                </if>
+            </if>
+            <if test="categoryId != null and categoryId != -1">
+                AND sm.category_id = #{categoryId}
+            </if>
+            <if test="labelId != null and labelId != -1">
+                AND sm.label_id = #{labelId}
+            </if>
+        </where>
     </select>
 
 </mapper>

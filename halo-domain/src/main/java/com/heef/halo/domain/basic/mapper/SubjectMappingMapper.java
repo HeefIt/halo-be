@@ -96,4 +96,11 @@ public interface SubjectMappingMapper {
      * @return 是否存在（true:存在, false:不存在）
      */
     Boolean existsById(@Param("id") Long id);
+
+    /**
+     * 查询关联表信息
+     * @param subjectMapping
+     * @return
+     */
+    List<SubjectMapping> queryMapping(SubjectMapping subjectMapping);
 }

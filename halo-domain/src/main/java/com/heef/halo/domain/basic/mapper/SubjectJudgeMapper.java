@@ -96,4 +96,11 @@ public interface SubjectJudgeMapper {
      * @return 是否存在（true:存在, false:不存在）
      */
     Boolean existsById(@Param("id") Long id);
+
+    /**
+     * 查询判断题详情信息
+     * @param subjectId
+     * @return
+     */
+    List<SubjectJudge> queryJudge( int subjectId);
 }

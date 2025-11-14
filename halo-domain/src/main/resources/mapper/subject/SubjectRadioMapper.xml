@@ -220,4 +220,18 @@
         WHERE id = #{id}
     </select>
 
+    <!--查询单选题详情信息-->
+    <select id="queryRadio" resultType="com.heef.halo.domain.basic.entity.SubjectRadio">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_radio
+        <where>
+            <if test="subjectId != null and subjectId != ''">
+                AND subject_id = #{subjectId}
+            </if>
+            AND is_deleted = 0
+        </where>
+        ORDER BY id ASC
+    </select>
+
 </mapper>

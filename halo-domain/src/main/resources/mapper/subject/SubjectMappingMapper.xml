@@ -206,4 +206,24 @@
         WHERE id = #{id}
     </select>
 
+    <!--查询关联表信息-->
+    <select id="queryMapping" resultType="com.heef.halo.domain.basic.entity.SubjectMapping">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_mapping
+        <where>
+            <if test="subjectId != null and subjectId != ''">
+                AND subject_id = #{subjectId}
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="labelId != null and labelId != ''">
+                AND label_id = #{labelId}
+            </if>
+            AND is_deleted = 0
+        </where>
+        ORDER BY id DESC
+    </select>
+
 </mapper>

@@ -1,10 +1,7 @@
 package com.heef.halo.domain.basic.service.impl;
 
 import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectBriefDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.*;
 import com.heef.halo.domain.basic.entity.*;
 import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandler;
 import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandlerFactory;
@@ -23,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * suject-题目业务层
@@ -259,108 +258,158 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean addSubject(SubjectInfoDTO subjectInfoDTO) {
-        //1.校验
+        //1. 校验
         if (subjectInfoDTO == null) {
             throw new RuntimeException("题目信息不能为空");
         }
-        //2.对象转换
+        //2. 对象转换
         SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+        subjectInfo.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
 
-        //3.插入数据到题目info总主表
+        //3. 插入数据到题目info总主表
         int inserted = subjectInfoMapper.insert(subjectInfo);
 
         //4.使用策略工厂处理不同题型插入
-        SubjectTypeHandler subjectTypeHandler =subjectTypeHandlerFactory.getHandler(subjectInfoDTO.getSubjectType());
+        SubjectTypeHandler subjectTypeHandler = subjectTypeHandlerFactory.getHandler(subjectInfoDTO.getSubjectType());
         subjectInfoDTO.setId(Math.toIntExact(subjectInfo.getId()));// 解决题目id没有插入到对应题目类型表的subjectId的问题
-        subjectTypeHandler.addSubject(subjectInfo.getId(),subjectInfoDTO);
+        subjectTypeHandler.addSubject(subjectInfo.getId(), subjectInfoDTO);
 
-        //5.获取插入数据的id,来同步到从表(关联表)mapping
+        //5. 获取插入数据的id,来同步到从表(关联表)mapping
         Long subjectInfoId = subjectInfo.getId();
 
-        //6.在mapping处理分类关联
+        //6. 在mapping处理分类关联
         List<Integer> categoryIds = subjectInfoDTO.getCategoryIds();
-        if (!CollectionUtils.isEmpty(categoryIds)) {
-            for (Integer categoryId : categoryIds) {
-                SubjectMapping subjectMapping = new SubjectMapping();
-                subjectMapping.setSubjectId(subjectInfoId);
-                subjectMapping.setCategoryId(Long.valueOf(categoryId));
-                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-                subjectMappingMapper.insert(subjectMapping);
-            }
-        }
-        //7.在mapping处理标签关联
         List<Integer> labelIds = subjectInfoDTO.getLabelIds();
-        if (!CollectionUtils.isEmpty(labelIds)) {
-            for (Integer labelId : labelIds) {
+        //7. 数据封装
+        List<SubjectMapping> mappingList = new LinkedList<>();
+        categoryIds.forEach(categoryId -> {
+            labelIds.forEach(labelId -> {
                 SubjectMapping subjectMapping = new SubjectMapping();
-                subjectMapping.setSubjectId(subjectInfoId);
+                subjectMapping.setSubjectId(Long.valueOf(subjectInfoId));
+                subjectMapping.setCategoryId(Long.valueOf(categoryId));
                 subjectMapping.setLabelId(Long.valueOf(labelId));
                 subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-                subjectMappingMapper.insert(subjectMapping);
-            }
+                // 添加创建人和更新人信息，避免数据库约束问题
+                subjectMapping.setCreatedBy("haloer");
+                subjectMapping.setUpdateBy("haloer");
+                mappingList.add(subjectMapping);
+            });
+        });
+        // 批量插入关联记录
+        if (!CollectionUtils.isEmpty(mappingList)) {
+            subjectMappingMapper.insertBatch(mappingList);
         }
 
-        return inserted!=0;
+        return inserted != 0;
+    }
+
+    /**
+     * 分页查询题目列表
+     *
+     * @param subjectInfoDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PageResult<SubjectInfoDTO> selectSubjectPage(SubjectInfoDTO subjectInfoDTO, Integer pageNum, Integer pageSize) {
+        //计算起始offset
+        int offset = (pageNum - 1) * pageSize;
+
+        //对象转换
+        SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+
+        //查询数据库
+        List<SubjectInfo> subjectInfoList = subjectInfoMapper.selectPage(subjectInfo, offset, pageSize);
+
+        Long total = subjectInfoMapper.count(subjectInfo);
+
+        //对象转换返回
+        List<SubjectInfoDTO> subjectInfoDTOList = subjectInfoConvert.toInfoDtoList(subjectInfoList);
+
+        //封装返回结果
+        return PageResult.<SubjectInfoDTO>builder()
+                .pageNo(pageNum)//起始页
+                .pageSize(pageSize)//当前页大小
+                .total(Math.toIntExact(total))//列表总数
+                .result(subjectInfoDTOList)//数据结果列表
+                .build();
+    }
+
+    /**
+     * 分页查询题目列表(面向用户)
+     *
+     * @param subjectInfoDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PageResult<SubjectInfoDTO> selectSubjectPage2(SubjectInfoDTO subjectInfoDTO, Integer pageNum, Integer pageSize) {
+        //计算起始offset
+        int offset = (pageNum - 1) * pageSize;
+        
+        //获取分类id和标签id
+        Integer categoryId = subjectInfoDTO.getCategoryId();
+        Integer labelId = subjectInfoDTO.getLabelId();
+
+        //对象转换
+        SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+
+        //查询数据库
+        List<SubjectInfo> subjectInfoList = subjectInfoMapper.selectPage2(subjectInfo, categoryId, labelId, offset, pageSize);
+
+        Long total = subjectInfoMapper.count2(subjectInfo, categoryId, labelId);
+
+        //对象转换返回
+        List<SubjectInfoDTO> subjectInfoDTOList = subjectInfoConvert.toInfoDtoList(subjectInfoList);
+
+        //封装返回结果
+        return PageResult.<SubjectInfoDTO>builder()
+                .pageNo(pageNum)//起始页
+                .pageSize(pageSize)//当前页大小
+                .total(Math.toIntExact(total))//列表总数
+                .result(subjectInfoDTOList)//数据结果列表
+                .build();
     }
 
 
-//    /**
-//     * 新增题目
-//     *
-//     * @param subjectInfoDTO
-//     * @return
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public Boolean addSubject(SubjectInfoDTO subjectInfoDTO) {
-//        //1.参数校验
-//        if (subjectInfoDTO == null) {
-//            throw new RuntimeException("题目信息不能为空");
-//        }
-//
-//        //2.dto转entity
-//        SubjectInfo subjectInfo = new SubjectInfo();
-//        subjectInfo.setSubjectName(subjectInfoDTO.getSubjectName());
-//        subjectInfo.setSubjectDifficult(subjectInfoDTO.getSubjectDifficult());
-//        subjectInfo.setSettleName(subjectInfoDTO.getSettleName());
-//        subjectInfo.setSubjectType(subjectInfoDTO.getSubjectType());
-//        subjectInfo.setSubjectScore(subjectInfoDTO.getSubjectScore());
-//        subjectInfo.setSubjectParse(subjectInfoDTO.getSubjectParse());
-//        subjectInfo.setSubjectAnswer(subjectInfoDTO.getSubjectAnswer());
-//        subjectInfo.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-//
-//        //3.插入题目信息
-//        subjectInfoMapper.insert(subjectInfo);
-//
-//        //4.获取题目id
-//        Long subjectId = subjectInfo.getId();
-//
-//        //5.处理分类和标签关联
-//        List<Integer> categoryIds = subjectInfoDTO.getCategoryIds();
-//        if (!CollectionUtils.isEmpty(categoryIds)) {
-//            for (Integer categoryId : categoryIds) {
-//                SubjectMapping subjectMapping = new SubjectMapping();
-//                subjectMapping.setSubjectId(subjectId);
-//                subjectMapping.setCategoryId(Long.valueOf(categoryId));
-//                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-//                subjectMappingMapper.insert(subjectMapping);
-//            }
-//        }
-//
-//        List<Integer> labelIds = subjectInfoDTO.getLabelIds();
-//        if (!CollectionUtils.isEmpty(labelIds)) {
-//            for (Integer labelId : labelIds) {
-//                SubjectMapping subjectMapping = new SubjectMapping();
-//                subjectMapping.setSubjectId(subjectId);
-//                subjectMapping.setLabelId(Long.valueOf(labelId));
-//                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-//                subjectMappingMapper.insert(subjectMapping);
-//            }
-//        }
-//
-//        //6.使用策略工厂处理不同题型
-//        subjectTypeHandlerFactory.getHandler(subjectInfoDTO.getSubjectType()).add(subjectInfo);
-//
-//        return true;
-//    }
+    /**
+     * 查看题目详情
+     *
+     * @param subjectInfoDTO
+     * @return
+     */
+    @Override
+    public SubjectInfoDTO selectSubjectInfo(SubjectInfoDTO subjectInfoDTO) {
+        //对象转换
+        SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+        //查询题目基本信息subjectInfoResult
+        SubjectInfo subjectInfoResult = subjectInfoMapper.queryByCondition(subjectInfo);
+        //查询具体题目的详情信息
+        SubjectTypeHandler subjectTypeHandler = subjectTypeHandlerFactory.getHandler(subjectInfoResult.getSubjectType());
+        SubjectOptionDTO subjectOptionDTO = subjectTypeHandler.querySubject(Math.toIntExact(subjectInfoResult.getId()));
+
+        //将查询出来的题目完整信息转换成DTO返回
+        SubjectInfoDTO dto = subjectInfoConvert.convertOptionAndInfoToDTO(subjectInfoResult, subjectOptionDTO);
+
+
+        //根据subjectInfoResult其中的题目id subjectId--到mapping中查询关联的分类标签数据
+        SubjectMapping subjectMapping = new SubjectMapping();
+        subjectMapping.setSubjectId(subjectInfoResult.getId());
+        subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+        List<SubjectMapping> subjectMappingList = subjectMappingMapper.queryMapping(subjectMapping);
+
+        //遍历subjectMappingList获取里面的标签id
+        List<Long> labelList = subjectMappingList.stream().map(SubjectMapping::getLabelId).collect(Collectors.toList());
+
+        //通过标签id查询对应的标签信息
+        List<SubjectLabel> subjectLabelList = subjectLabelMapper.batchQueryLabel(labelList);
+        List<String> labelNameList = subjectLabelList.stream().map(SubjectLabel::getLabelName).collect(Collectors.toList());
+
+        dto.setLabelName(labelNameList);
+        return dto;
+    }
+
+
 }

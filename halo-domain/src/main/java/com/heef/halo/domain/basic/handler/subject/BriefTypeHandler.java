@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.handler.subject;
 
+import com.alibaba.fastjson.JSON;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectOptionDTO;
 import com.heef.halo.domain.basic.entity.SubjectBrief;
@@ -47,8 +48,11 @@ public class BriefTypeHandler implements SubjectTypeHandler {
      */
     @Override
     public void addSubject(Long id,SubjectInfoDTO subjectInfoDTO) {
-        log.info("正在新增简答题!!!");
-        //对象转换
+        if(log.isInfoEnabled()){
+            log.info("正在新增简答题!!!:{}", JSON.toJSONString(subjectInfoDTO));
+        }
+        //对象转换---存subjectAnswer字段
+        //这里可以直接转换是因为SubjectInfoDTO中有subjectAnswer字段，而SubjectBrief实体也有对应的subjectAnswer字段，所以可以直接通过MapStruct进行转换。
         SubjectBrief subjectBrief = subjectBriefConvert.toBriefEntity(subjectInfoDTO);
 
         subjectBrief.setSubjectId(id);//这里的id与实体类插入数据库的id不同;主要处理
@@ -65,7 +69,14 @@ public class BriefTypeHandler implements SubjectTypeHandler {
      */
     @Override
     public SubjectOptionDTO querySubject(int subjectId) {
-        return null;
+        //查询简答题
+        SubjectBrief subjectBrief=subjectBriefService.queryBrief(subjectId);
+
+        SubjectOptionDTO subjectOptionDTO = new SubjectOptionDTO();
+        //组装answer--返回
+        subjectOptionDTO.setSubjectAnswer(subjectBrief.getSubjectAnswer());
+
+        return subjectOptionDTO;
     }
 
 

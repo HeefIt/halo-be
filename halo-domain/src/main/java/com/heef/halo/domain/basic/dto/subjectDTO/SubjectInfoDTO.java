@@ -53,12 +53,12 @@ public class SubjectInfoDTO implements Serializable {
     private String subjectAnswer;
 
     /**
-     * 分类id
+     * 分类id (新增的时候使用)--可能一个题目对应多个分类和标签
      */
     private List<Integer> categoryIds;
 
     /**
-     * 标签id
+     * 标签id (新增的时候使用)--可能一个题目对应多个分类和标签
      */
     private List<Integer> labelIds;
 
@@ -68,12 +68,12 @@ public class SubjectInfoDTO implements Serializable {
     private List<SubjectAnswerDTO> optionList;
 
     /**
-     * 分类id
+     * 分类id  (查询的时候使用)
      */
     private Integer categoryId;
 
     /**
-     * 标签id
+     * 标签id (查询的时候使用)
      */
     private Integer labelId;
 

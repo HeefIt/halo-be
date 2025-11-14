@@ -220,4 +220,18 @@
         WHERE id = #{id}
     </select>
 
+    <!--查询多选题详情信息-->
+    <select id="queryMultiple" resultType="com.heef.halo.domain.basic.entity.SubjectMultiple">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_multiple
+        <where>
+            <if test="subjectId != null">
+                AND subject_id = #{subjectId}
+            </if>
+            AND is_deleted = 0
+        </where>
+        ORDER BY id ASC
+    </select>
+
 </mapper>

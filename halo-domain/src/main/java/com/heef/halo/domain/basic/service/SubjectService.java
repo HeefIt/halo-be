@@ -74,4 +74,33 @@ public interface SubjectService {
      * @return
      */
     Boolean addSubject(SubjectInfoDTO subjectInfoDTO);
+
+    /**
+     * 分页查询题目列表
+     * @param subjectInfoDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    PageResult<SubjectInfoDTO> selectSubjectPage(SubjectInfoDTO subjectInfoDTO, Integer pageNum, Integer pageSize);
+
+
+    /**
+     * 分页查询题目列表(面向用户)
+     * @param subjectInfoDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    PageResult<SubjectInfoDTO> selectSubjectPage2(SubjectInfoDTO subjectInfoDTO, Integer pageNum, Integer pageSize);
+
+
+    /**
+     * 查看题目详情
+     * @param subjectInfoDTO
+     * @return
+     */
+    SubjectInfoDTO selectSubjectInfo(SubjectInfoDTO subjectInfoDTO);
+
+
 }

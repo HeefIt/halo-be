@@ -1,75 +1,59 @@
-# 题目模块工厂加策略模式重构设计文档
+# 题目模块工厂加策略模式设计文档
 
-## 1. 现有架构分析
+## 1. 系统架构说明
 
-当前题目模块采用三层架构：
+当前题目模块采用标准的分层架构：
 ```
-Controller(DTO) -> Service(BO) -> Infra(Entity)
+Controller(DTO) -> Service -> Mapper -> Entity
 ```
 
 其中：
+- Controller层：负责处理HTTP请求，参数校验和响应封装
+- Service层：负责业务逻辑处理
+- Mapper层：负责数据访问
+- Entity：实体对象，与数据库表结构一一对应
 - DTO：数据传输对象，用于前后端交互
-- BO：业务对象，用于业务逻辑处理
-- Entity：实体对象，用于数据库操作
 
-## 2. 重构目标
+## 2. 题目实体类设计
 
-将架构重构为两层架构，去除BO层：
-```
-Controller(DTO) -> Service(Entity)
-```
-
-优势：
-- 简化数据流转层次
-- 减少对象转换开销
-- 保持系统的扩展性和可维护性
-
-## 3. 重构后的实体类设计
-
-### 3.1 题目信息实体类 (SubjectInfoEntity)
+### 2.1 题目信息实体类 (SubjectInfo)
 
 ```java
 @Data
-public class SubjectInfoEntity implements Serializable {
-    private static final long serialVersionUID = -98680207564099835L;
-    
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+public class SubjectInfo implements Serializable {
+    private static final long serialVersionUID = -71401209593239253L;
     /**
      * 主键
      */
     private Integer id;
-    
     /**
      * 题目名称
      */
     private String subjectName;
-    
     /**
      * 题目难度
      */
     private Integer subjectDifficult;
-    
     /**
      * 出题人名
      */
     private String settleName;
-    
     /**
      * 题目类型 1单选 2多选 3判断 4简答
      */
     private Integer subjectType;
-    
     /**
      * 题目分数
      */
     private Integer subjectScore;
-    
     /**
      * 题目解析
      */
     private String subjectParse;
-    
     /**
-     * 题目答案（用于简答题）
+     * 题目答案
      */
     private String subjectAnswer;
     
@@ -84,54 +68,26 @@ public class SubjectInfoEntity implements Serializable {
     private Date createdTime;
     
     /**
-     * 更新人
+     * 修改人
      */
-    private String updatedBy;
+    private String updateBy;
     
     /**
-     * 更新时间
+     * 修改时间
      */
-    private Date updatedTime;
+    private Date updateTime;
     
     private Integer isDeleted;
-    
-    /**
-     * 分类id列表
-     */
-    private List<Integer> categoryIds;
-
-    /**
-     * 标签id列表
-     */
-    private List<Integer> labelIds;
-
-    /**
-     * 选项列表（用于选择题和判断题）
-     */
-    private List<SubjectAnswerEntity> optionList;
-
-    /**
-     * 分类id
-     */
-    private Integer categoryId;
-
-    /**
-     * 标签id
-     */
-    private Integer labelId;
-
-    /**
-     * 标签名字列表
-     */
-    private List<String> labelName;
 }
 ```
 
-### 3.2 题目答案实体类 (SubjectAnswerEntity)
+### 2.2 题目答案实体类 (SubjectAnswer)
 
 ```java
 @Data
-public class SubjectAnswerEntity implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+public class SubjectAnswer implements Serializable {
     private static final long serialVersionUID = -98680207564099835L;
     
     /**
@@ -167,47 +123,20 @@ public class SubjectAnswerEntity implements Serializable {
     /**
      * 更新人
      */
-    private String updatedBy;
+    private String updateBy;
     
     /**
      * 更新时间
      */
-    private Date updatedTime;
+    private Date updateTime;
     
     private Integer isDeleted;
 }
 ```
 
-### 3.3 题目选项封装类 (SubjectOptionEntity)
+## 3. 策略模式设计
 
-```java
-@Data
-public class SubjectOptionEntity implements Serializable {
-    /**
-     * 正确答案对应的选项类型（如 "A"）正确
-     */
-    private String subjectAnswer;
-    
-    /**
-     * 所有选项列表（如 A/B/C/D），每个选项包含内容和是否正确标记
-     */
-    private List<SubjectAnswerEntity> optionList;
-
-    /**
-     * 题目的分类
-     */
-    private Integer categoryId;
-
-    /**
-     * 题目的标签
-     */
-    private Integer labelId;
-}
-```
-
-## 4. 策略模式重构设计
-
-### 4.1 题目类型处理接口 (SubjectTypeHandler)
+### 3.1 题目类型处理接口 (SubjectTypeHandler)
 
 ```java
 public interface SubjectTypeHandler {
@@ -219,20 +148,21 @@ public interface SubjectTypeHandler {
 
     /**
      * 添加题目
-     * @param subjectInfoEntity 题目实体
+     * @param subjectId 题目ID
+     * @param subjectInfoDTO 题目信息
      */
-    void add(SubjectInfoEntity subjectInfoEntity);
+    void addSubject(Long subjectId, SubjectInfoDTO subjectInfoDTO);
 
     /**
      * 查询题目选项信息
      * @param subjectId 题目ID
      * @return 题目选项信息
      */
-    SubjectOptionEntity query(int subjectId);
+    SubjectOptionDTO querySubject(int subjectId);
 }
 ```
 
-### 4.2 题目类型工厂类 (SubjectTypeHandlerFactory)
+### 3.2 题目类型工厂类 (SubjectTypeHandlerFactory)
 
 ```java
 @Component
@@ -268,13 +198,13 @@ public class SubjectTypeHandlerFactory implements InitializingBean {
 }
 ```
 
-### 4.3 各类型题目处理器实现示例
+### 3.3 各类型题目处理器实现示例
 
-#### 单选题处理器 (RadioTypeHandler)
+#### 单选题处理器 (RadioSubjectTypeHandler)
 
 ```java
 @Component
-public class RadioTypeHandler implements SubjectTypeHandler {
+public class RadioSubjectTypeHandler implements SubjectTypeHandler {
     @Autowired
     private SubjectRadioService subjectRadioService;
 
@@ -284,39 +214,41 @@ public class RadioTypeHandler implements SubjectTypeHandler {
     }
 
     @Override
-    public void add(SubjectInfoEntity subjectInfoEntity) {
+    public void addSubject(Long subjectId, SubjectInfoDTO subjectInfoDTO) {
         // 单项选择题的添加
-        List<SubjectRadioEntity> subjectRadioList = new LinkedList<>();
+        List<SubjectRadioDTO> subjectRadioList = new LinkedList<>();
         
-        subjectInfoEntity.getOptionList().forEach(option -> {
-            SubjectRadioEntity subjectRadio = RadioSubjectConverter.INSTANCE.convertEntityToEntity(option);
-            subjectRadio.setSubjectId(subjectInfoEntity.getId());
-            subjectRadio.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-            subjectRadioList.add(subjectRadio);
+        subjectInfoDTO.getOptionList().forEach(option -> {
+            SubjectRadioDTO subjectRadioDTO = new SubjectRadioDTO();
+            subjectRadioDTO.setSubjectId(subjectId);
+            subjectRadioDTO.setOptionType(option.getOptionType());
+            subjectRadioDTO.setOptionContent(option.getOptionContent());
+            subjectRadioDTO.setIsCorrect(option.getIsCorrect());
+            subjectRadioDTO.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+            subjectRadioList.add(subjectRadioDTO);
         });
         
         subjectRadioService.InsertBatch(subjectRadioList);
     }
 
     @Override
-    public SubjectOptionEntity query(int subjectId) {
-        SubjectRadioEntity subjectRadio = new SubjectRadioEntity();
-        subjectRadio.setSubjectId(subjectId);
-        List<SubjectRadioEntity> subjectRadioList = subjectRadioService.queryByCondition(subjectRadio);
+    public SubjectOptionDTO querySubject(int subjectId) {
+        SubjectRadioDTO subjectRadioDTO = new SubjectRadioDTO();
+        subjectRadioDTO.setSubjectId((long) subjectId);
+        List<SubjectRadioDTO> subjectRadioList = subjectRadioService.queryByCondition(subjectRadioDTO);
 
-        List<SubjectAnswerEntity> subjectAnswerEntityList = RadioSubjectConverter.INSTANCE.convertEntityListToEntityList(subjectRadioList);
-        SubjectOptionEntity subjectOptionEntity = new SubjectOptionEntity();
-        subjectOptionEntity.setOptionList(subjectAnswerEntityList);
-        return subjectOptionEntity;
+        SubjectOptionDTO subjectOptionDTO = new SubjectOptionDTO();
+        subjectOptionDTO.setOptionList(subjectRadioList);
+        return subjectOptionDTO;
     }
 }
 ```
 
-#### 简答题处理器 (BriefTypeHandler)
+#### 简答题处理器 (BriefSubjectTypeHandler)
 
 ```java
 @Component
-public class BriefTypeHandler implements SubjectTypeHandler {
+public class BriefSubjectTypeHandler implements SubjectTypeHandler {
     @Autowired
     private SubjectBriefService subjectBriefService;
 
@@ -326,176 +258,412 @@ public class BriefTypeHandler implements SubjectTypeHandler {
     }
     
     @Override
-    public void add(SubjectInfoEntity subjectInfoEntity) {
-        SubjectBriefEntity subjectBrief = BriefSubjectConverter.INSTANCE.convertEntityToEntity(subjectInfoEntity);
-        subjectBrief.setSubjectId(subjectInfoEntity.getId());
-        subjectBrief.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-        subjectBriefService.insert(subjectBrief);
+    public void addSubject(Long subjectId, SubjectInfoDTO subjectInfoDTO) {
+        SubjectBriefDTO subjectBriefDTO = new SubjectBriefDTO();
+        subjectBriefDTO.setSubjectId(subjectId);
+        subjectBriefDTO.setSubjectAnswer(subjectInfoDTO.getSubjectAnswer());
+        subjectBriefDTO.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+        subjectBriefService.insert(subjectBriefDTO);
     }
 
     @Override
-    public SubjectOptionEntity query(int subjectId) {
-        SubjectBriefEntity subjectBrief = new SubjectBriefEntity();
-        subjectBrief.setSubjectId(subjectId);
-        SubjectBriefEntity result = subjectBriefService.queryByCondition(subjectBrief);
+    public SubjectOptionDTO querySubject(int subjectId) {
+        SubjectBriefDTO subjectBriefDTO = new SubjectBriefDTO();
+        subjectBriefDTO.setSubjectId((long) subjectId);
+        SubjectBriefDTO result = subjectBriefService.queryByCondition(subjectBriefDTO);
 
-        SubjectOptionEntity subjectOptionEntity = new SubjectOptionEntity();
-        subjectOptionEntity.setSubjectAnswer(result.getSubjectAnswer());
-        return subjectOptionEntity;
+        SubjectOptionDTO subjectOptionDTO = new SubjectOptionDTO();
+        subjectOptionDTO.setSubjectAnswer(result.getSubjectAnswer());
+        return subjectOptionDTO;
     }
 }
 ```
 
-## 5. 转换器设计
+## 4. 转换器设计
 
-### 5.1 DTO与Entity转换器 (SubjectInfoConverter)
+### 4.1 DTO与Entity转换器 (SubjectInfoConvert)
 
 ```java
 @Mapper
-public interface SubjectInfoConverter {
-    SubjectInfoConverter INSTANCE = Mappers.getMapper(SubjectInfoConverter.class);
+public interface SubjectInfoConvert {
+    SubjectInfoConvert INSTANCE = Mappers.getMapper(SubjectInfoConvert.class);
 
     // DTO转Entity
-    SubjectInfoEntity convertDtoToEntity(SubjectInfoDTO subjectInfoDTO);
+    SubjectInfo toInfoEntity(SubjectInfoDTO subjectInfoDTO);
 
     // Entity转DTO
-    SubjectInfoDTO convertEntityToDto(SubjectInfoEntity subjectInfoEntity);
+    SubjectInfoDTO convertInfoToDTO(SubjectInfo subjectInfo);
+    
+    // Entity转DTO（带选项信息）
+    SubjectInfoDTO convertOptionAndInfoToDTO(SubjectInfo subjectInfo, SubjectOptionDTO subjectOptionDTO);
 
     // Entity列表转DTO列表
-    List<SubjectInfoDTO> convertEntityListToDtoList(List<SubjectInfoEntity> subjectInfoEntityList);
-    
-    // 选项信息Entity与题目信息Entity合并
-    SubjectInfoDTO mergeOptionAndInfoToDto(SubjectOptionEntity optionEntity, SubjectInfoEntity infoEntity);
+    List<SubjectInfoDTO> toInfoDtoList(List<SubjectInfo> subjectInfoList);
 }
 ```
 
-## 6. 服务层重构
+## 5. 题目管理接口文档
 
-### 6.1 题目信息服务接口 (SubjectInfoDomainService)
+### 5.1 题目分类管理接口
 
-```java
-public interface SubjectInfoDomainService {
-    /**
-     * 新增题目
-     * @param subjectInfoEntity 题目实体
-     */
-    void add(SubjectInfoEntity subjectInfoEntity);
-
-    /**
-     * 分页查询题目
-     * @param subjectInfoEntity 查询条件
-     * @return 分页结果
-     */
-    PageResult<SubjectInfoEntity> getSubjectPage(SubjectInfoEntity subjectInfoEntity);
-
-    /**
-     * 查询题目详情
-     * @param subjectInfoEntity 查询条件
-     * @return 题目详情
-     */
-    SubjectInfoEntity querySubjectInfo(SubjectInfoEntity subjectInfoEntity);
+#### 新增题目分类
+- **接口地址**: `POST /api/subject/category/add`
+- **请求参数**:
+```
+{
+  "categoryName": "Java基础",
+  "categoryType": 1,
+  "parentId": 0
+}
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
 }
 ```
 
-### 6.2 题目信息服务实现类 (SubjectInfoDomainServiceImpl)
+#### 分页查询分类列表
+- **接口地址**: `GET /api/subject/category/selectPage`
+- **请求参数**:
+```
+categoryName: Java     // 分类名称（可选）
+pageNum: 1             // 页码（默认1）
+pageSize: 10           // 每页条数（默认10）
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "pageNo": 1,
+    "pageSize": 10,
+    "total": 100,
+    "pages": 10,
+    "result": [
+      {
+        "id": 1,
+        "categoryName": "Java基础",
+        "categoryType": 1,
+        "parentId": 0
+      }
+    ]
+  }
+}
+```
 
-```java
-@Slf4j
-@Service("SubjectInfoDomainService")
-public class SubjectInfoDomainServiceImpl implements SubjectInfoDomainService {
-    @Autowired
-    private SubjectInfoService subjectInfoService;
+#### 修改分类
+- **接口地址**: `PUT /api/subject/category/update/{id}`
+- **请求参数**:
+```
+{
+  "categoryName": "Java进阶",
+  "categoryType": 1,
+  "parentId": 0
+}
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
+}
+```
 
-    @Autowired
-    private SubjectTypeHandlerFactory subjectTypeHandlerFactory;
+#### 删除分类
+- **接口地址**: `DELETE /api/subject/category/delete/{id}`
+- **请求参数**: 无
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
+}
+```
 
-    @Autowired
-    private SubjectMappingService subjectMappingService;
+### 5.2 题目标签管理接口
 
-    @Autowired
-    private SubjectLabelService subjectLabelService;
+#### 新增题目标签
+- **接口地址**: `POST /api/subject/label/add`
+- **请求参数**:
+```
+{
+  "labelName": "集合",
+  "categoryId": 1
+}
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
+}
+```
 
-    /**
-     * 新增题目
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void add(SubjectInfoEntity subjectInfoEntity) {
-        if (log.isInfoEnabled()) {
-            log.info("SubjectInfoDomainServiceImpl.add.entity: {}", JSON.toJSONString(subjectInfoEntity));
-        }
-        
-        // 插入题目基本信息
-        subjectInfoService.insert(subjectInfoEntity);
-        
-        // 使用工厂+策略模式处理不同类型题目的选项信息
-        SubjectTypeHandler subjectTypeHandler = subjectTypeHandlerFactory.getHandler(subjectInfoEntity.getSubjectType());
-        subjectTypeHandler.add(subjectInfoEntity);
-        
-        // 处理题目与分类、标签的关联关系
-        List<Integer> categoryIds = subjectInfoEntity.getCategoryIds();
-        List<Integer> labelIds = subjectInfoEntity.getLabelIds();
+#### 分页查询标签列表
+- **接口地址**: `GET /api/subject/label/selectPage`
+- **请求参数**:
+```
+labelName: 集合       // 标签名称（可选）
+categoryId: 1          // 分类ID（可选）
+pageNum: 1             // 页码（默认1）
+pageSize: 10           // 每页条数（默认10）
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "pageNo": 1,
+    "pageSize": 10,
+    "total": 100,
+    "pages": 10,
+    "result": [
+      {
+        "id": 1,
+        "labelName": "集合",
+        "categoryId": 1
+      }
+    ]
+  }
+}
+```
 
-        List<SubjectMappingEntity> mappingList = new LinkedList<>();
-        categoryIds.forEach(categoryId -> {
-            labelIds.forEach(labelId -> {
-                SubjectMappingEntity subjectMapping = new SubjectMappingEntity();
-                subjectMapping.setSubjectId(Long.valueOf(subjectInfoEntity.getId()));
-                subjectMapping.setCategoryId(Long.valueOf(categoryId));
-                subjectMapping.setLabelId(Long.valueOf(labelId));
-                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-                mappingList.add(subjectMapping);
-            });
-        });
-        
-        // 批量插入题目关系数据
-        subjectMappingService.InsertBatch(mappingList);
+#### 修改标签
+- **接口地址**: `PUT /api/subject/label/update/{id}`
+- **请求参数**:
+```
+{
+  "labelName": "多线程",
+  "categoryId": 1
+}
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
+}
+```
+
+#### 删除标签
+- **接口地址**: `DELETE /api/subject/label/delete/{id}`
+- **请求参数**: 无
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
+}
+```
+
+### 5.3 题目信息管理接口
+
+#### 新增题目
+- **接口地址**: `POST /api/subject/info/add`
+- **请求参数**:
+```
+{
+  "subjectName": "Java中String是不可变的吗？",
+  "subjectDifficult": 1,
+  "settleName": "张三",
+  "subjectType": 4,
+  "subjectScore": 10,
+  "subjectParse": "String是不可变的主要体现在...",
+  "subjectAnswer": "String是不可变的原因有...",
+  "categoryIds": [1],
+  "labelIds": [1, 2]
+}
+```
+
+对于选择题，还需要提供选项信息:
+```
+{
+  "subjectName": "以下哪些是Java的基本数据类型？",
+  "subjectDifficult": 1,
+  "settleName": "张三",
+  "subjectType": 2, // 多选题
+  "subjectScore": 10,
+  "subjectParse": "Java的基本数据类型包括...",
+  "categoryIds": [1],
+  "labelIds": [1],
+  "optionList": [
+    {
+      "optionType": 1,
+      "optionContent": "int",
+      "isCorrect": 1
+    },
+    {
+      "optionType": 2,
+      "optionContent": "String",
+      "isCorrect": 0
+    },
+    {
+      "optionType": 3,
+      "optionContent": "double",
+      "isCorrect": 1
+    },
+    {
+      "optionType": 4,
+      "optionContent": "Boolean",
+      "isCorrect": 0
     }
-
-    /**
-     * 查询题目详情
-     */
-    @Override
-    public SubjectInfoEntity querySubjectInfo(SubjectInfoEntity subjectInfoEntity) {
-        // 查询题目基本信息
-        SubjectInfoEntity infoEntity = subjectInfoService.queryById(subjectInfoEntity.getId());
-        
-        // 使用工厂获取对应题型的处理器查询选项信息
-        SubjectTypeHandler handler = subjectTypeHandlerFactory.getHandler(infoEntity.getSubjectType());
-        SubjectOptionEntity optionEntity = handler.query(infoEntity.getId().intValue());
-        
-        // 合并题目基本信息和选项信息
-        SubjectInfoEntity resultEntity = SubjectInfoConverter.INSTANCE.mergeOptionAndInfoToEntity(optionEntity, infoEntity);
-
-        // 查询题目关联的标签
-        SubjectMappingEntity subjectMapping = new SubjectMappingEntity();
-        subjectMapping.setSubjectId(Long.valueOf(infoEntity.getId()));
-        subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-        List<SubjectMappingEntity> mappingList = subjectMappingService.queryLabelId(subjectMapping);
-        List<Long> labelIdList = mappingList.stream().map(SubjectMappingEntity::getLabelId).collect(Collectors.toList());
-
-        // 根据标签id进行批量查询
-        List<SubjectLabelEntity> labelList = subjectLabelService.batchQueryById(labelIdList);
-
-        // 组装所有数据返回
-        List<String> labelNameList = labelList.stream().map(SubjectLabelEntity::getLabelName).collect(Collectors.toList());
-        resultEntity.setLabelName(labelNameList);
-
-        return resultEntity;
-    }
-    
-    // ... 其他方法实现
+  ]
+}
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": true
 }
 ```
 
-## 7. 总结
+#### 分页查询题目列表(管理后台)
+- **接口地址**: `GET /api/subject/info/selectPageToAdmin`
+- **请求参数**:
+```
+subjectName: String            // 题目名称（模糊查询，可选）
+subjectDifficult: 1            // 题目难度（可选）
+subjectType: 1                 // 题目类型（可选）
+pageNum: 1                     // 页码（默认1）
+pageSize: 10                   // 每页条数（默认10）
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "pageNo": 1,
+    "pageSize": 10,
+    "total": 100,
+    "pages": 10,
+    "result": [
+      {
+        "id": 1,
+        "subjectName": "Java中String是不可变的吗？",
+        "subjectDifficult": 1,
+        "settleName": "张三",
+        "subjectType": 4,
+        "subjectScore": 10
+      }
+    ]
+  }
+}
+```
 
-重构为两层架构的关键点：
+#### 分页查询题目列表(面向用户)
+- **接口地址**: `GET /api/subject/info/selectPageToUser`
+- **请求参数**:
+```
+subjectName: String            // 题目名称（模糊查询，可选）
+subjectDifficult: 1            // 题目难度（可选）
+subjectType: 1                 // 题目类型（可选）
+categoryId: 1                  // 分类ID（可选）
+labelId: 1                     // 标签ID（可选）
+pageNum: 1                     // 页码（默认1）
+pageSize: 10                   // 每页条数（默认10）
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "pageNo": 1,
+    "pageSize": 10,
+    "total": 100,
+    "pages": 10,
+    "result": [
+      {
+        "id": 1,
+        "subjectName": "Java中String是不可变的吗？",
+        "subjectDifficult": 1,
+        "settleName": "张三",
+        "subjectType": 4,
+        "subjectScore": 10
+      }
+    ]
+  }
+}
+```
 
-1. **简化数据传输**：去掉了BO层，直接使用Entity承载业务数据
-2. **保持策略模式**：题目类型的处理仍然使用工厂+策略模式，保证扩展性
-3. **实体类增强**：Entity类增加了原本在BO层的业务属性，如选项列表等
-4. **转换器优化**：简化了DTO与Entity之间的转换逻辑
-5. **服务层调整**：服务层直接操作Entity，减少了一层转换
+#### 查询题目详情
+- **接口地址**: `GET /api/subject/info/selectSubjectInfo`
+- **请求参数**:
+```
+id: 1                          // 题目ID（必填）
+```
+- **响应结果**:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 1,
+    "subjectName": "Java中String是不可变的吗？",
+    "subjectDifficult": 1,
+    "settleName": "张三",
+    "subjectType": 4,
+    "subjectScore": 10,
+    "subjectParse": "String是不可变的主要体现在...",
+    "subjectAnswer": "String是不可变的原因有...",
+    "labelName": ["集合", "基础"]
+  }
+}
+```
 
-这种设计保留了原有系统的扩展性和可维护性，同时减少了层级，使代码更加简洁。每种题型的处理逻辑仍然相互独立，新增题型时只需实现SubjectTypeHandler接口即可。
+对于选择题，还会包含选项信息:
+```
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": 1,
+    "subjectName": "以下哪些是Java的基本数据类型？",
+    "subjectDifficult": 1,
+    "settleName": "张三",
+    "subjectType": 2,
+    "subjectScore": 10,
+    "subjectParse": "Java的基本数据类型包括...",
+    "optionList": [
+      {
+        "optionType": 1,
+        "optionContent": "int",
+        "isCorrect": 1
+      },
+      {
+        "optionType": 2,
+        "optionContent": "String",
+        "isCorrect": 0
+      },
+      {
+        "optionType": 3,
+        "optionContent": "double",
+        "isCorrect": 1
+      },
+      {
+        "optionType": 4,
+        "optionContent": "Boolean",
+        "isCorrect": 0
+      }
+    ],
+    "labelName": ["基础"]
+  }
+}
+```
+
+## 6. 总结
+
+本系统通过工厂+策略模式的设计，实现了对不同类型题目的统一处理。每种题型的处理逻辑相互独立，新增题型时只需实现SubjectTypeHandler接口即可，保证了系统的扩展性和可维护性。

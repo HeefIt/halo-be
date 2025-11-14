@@ -123,6 +123,16 @@ public class SubjectController {
         }
     }
 
+
+
+
+
+
+    /*---------------------------------------------------标签模块-------------------------------------------------------*/
+    /*---------------------------------------------------标签模块-------------------------------------------------------*/
+    /*---------------------------------------------------标签模块-------------------------------------------------------*/
+
+
     /**
      * 新增题目标签
      *
@@ -156,8 +166,8 @@ public class SubjectController {
     @SaCheckLogin
     @GetMapping("/label/selectPage")
     public Result<PageResult<SubjectLabelDTO>> selectPageLabel(SubjectLabelDTO subjectLabelDTO,
-                                                                  @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
-                                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+                                                               @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+                                                               @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         try {
             if (log.isInfoEnabled()) {
                 log.info("SubjectController.selectPageLabel.dto: {}"
@@ -222,22 +232,98 @@ public class SubjectController {
     }
 
 
+
+
+/*---------------------------------------------------题目模块-----------------------------------------------------------*/
+/*---------------------------------------------------题目模块-----------------------------------------------------------*/
+/*---------------------------------------------------题目模块-----------------------------------------------------------*/
+
     /**
      * 新增题目
+     *
      * @param subjectInfoDTO
      * @return
      */
     @PostMapping("/info/add")
-    public Result<Boolean> addSubject(@RequestBody SubjectInfoDTO subjectInfoDTO){
-        try{
-            if(log.isInfoEnabled()){
+    public Result<Boolean> addSubject(@RequestBody SubjectInfoDTO subjectInfoDTO) {
+        try {
+            if (log.isInfoEnabled()) {
                 log.info("SubjectController.addSubject.subjectInfoDTO: {}", JSON.toJSONString(subjectInfoDTO));
             }
             Boolean result = subjectService.addSubject(subjectInfoDTO);
             return Result.ok("新增题目结果为:" + result);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("新增题目失败:", e);
             return Result.fail("新增题目失败:" + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 分页查询题目列表(管理后台)
+     *
+     * @param subjectInfoDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/info/selectPageToAdmin")
+    public Result<PageResult<SubjectInfoDTO>> selectSubjectPage(SubjectInfoDTO subjectInfoDTO,
+                                                                @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+                                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.selectSubjectPage.subjectInfoDTO: {}", JSON.toJSONString(subjectInfoDTO));
+            }
+            PageResult<SubjectInfoDTO> pageResult = subjectService.selectSubjectPage(subjectInfoDTO, pageNum, pageSize);
+            return Result.ok(pageResult);
+        } catch (Exception e) {
+            log.error("分页查询题目列表失败: {}", e.getMessage(), e);
+            return Result.fail("分页查询题目列表失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 分页查询题目列表(面向用户)
+     *
+     * @param subjectInfoDTO
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @GetMapping("/info/selectPageToUser")
+    public Result<PageResult<SubjectInfoDTO>> selectSubjectPage2(SubjectInfoDTO subjectInfoDTO,
+                                                                @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+                                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.selectSubjectPage2.subjectInfoDTO: {}", JSON.toJSONString(subjectInfoDTO));
+            }
+            PageResult<SubjectInfoDTO> pageResult = subjectService.selectSubjectPage2(subjectInfoDTO, pageNum, pageSize);
+            return Result.ok(pageResult);
+        } catch (Exception e) {
+            log.error("分页查询题目列表失败: {}", e.getMessage(), e);
+            return Result.fail("分页查询题目列表失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 条件查看题目详情
+     *
+     * @param
+     * @return
+     */
+    @GetMapping("/info/selectSubjectInfo")
+    public Result<SubjectInfoDTO> selectSubjectInfo(SubjectInfoDTO subjectInfoDTO) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.querySubjectInfo: {}", JSON.toJSONString(subjectInfoDTO));
+            }
+            SubjectInfoDTO subjectInfoDTOResult = subjectService.selectSubjectInfo(subjectInfoDTO);
+            return Result.ok(subjectInfoDTOResult);
+        } catch (Exception e) {
+            log.error("查看题目详情失败: {}", e.getMessage(), e);
+            return Result.fail("查看题目详情失败:" + e.getMessage());
         }
     }
 

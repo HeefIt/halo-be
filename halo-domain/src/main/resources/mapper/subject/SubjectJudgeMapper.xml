@@ -193,4 +193,14 @@
         WHERE id = #{id}
     </select>
 
+    <!--查询判断题详情信息-->
+    <select id="queryJudge" resultType="com.heef.halo.domain.basic.entity.SubjectJudge">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_judge
+        WHERE subject_id = #{subjectId}
+        AND is_deleted = 0
+        ORDER BY id DESC
+    </select>
+
 </mapper>

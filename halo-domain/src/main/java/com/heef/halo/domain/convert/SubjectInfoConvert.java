@@ -1,6 +1,7 @@
 package com.heef.halo.domain.convert;
 
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.SubjectOptionDTO;
 import com.heef.halo.domain.basic.entity.SubjectInfo;
 import org.mapstruct.Mapper;
 
@@ -22,4 +23,5 @@ public interface SubjectInfoConvert {
     //info entityList-->dtoList
     List<SubjectInfoDTO> toInfoDtoList(List<SubjectInfo> subjectInfoList);
 
+    SubjectInfoDTO convertOptionAndInfoToDTO(SubjectInfo subjectInfoResult, SubjectOptionDTO subjectOptionDTO);
 }

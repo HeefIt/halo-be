@@ -8,4 +8,11 @@ public interface SubjectBriefService {
      * @param subjectBrief
      */
     void insert(SubjectBrief subjectBrief);
+
+    /**
+     * 根据题目id查询简答题具体信息
+     * @param subjectId
+     * @return
+     */
+    SubjectBrief queryBrief(int subjectId);
 }

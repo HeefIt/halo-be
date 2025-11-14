@@ -96,4 +96,32 @@ public interface SubjectInfoMapper {
      * @return 是否存在（true:存在, false:不存在）
      */
     Boolean existsById(@Param("id") Long id);
+
+    /**
+     * 条件查询指定行题目数据
+     * @param subjectInfo
+     * @return
+     */
+    SubjectInfo queryByCondition(@Param("param") SubjectInfo subjectInfo);
+
+    /**
+     * 分页查询题目列表(面向用户)
+     * @param subjectInfo
+     * @param categoryId
+     * @param labelId
+     * @param offset
+     * @param pageSize
+     * @return
+     */
+    List<SubjectInfo> selectPage2(@Param("subjectInfo") SubjectInfo subjectInfo, @Param("categoryId") Integer categoryId, 
+                                 @Param("labelId") Integer labelId, @Param("offset") int offset, @Param("pageSize") Integer pageSize);
+
+    /**
+     * 统计题目总数(面向用户)
+     * @param subjectInfo
+     * @param categoryId
+     * @param labelId
+     * @return
+     */
+    Long count2(@Param("subjectInfo") SubjectInfo subjectInfo, @Param("categoryId") Integer categoryId, @Param("labelId") Integer labelId);
 }

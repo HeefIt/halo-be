@@ -27,4 +27,15 @@ public class SubjectBriefServiceImpl implements SubjectBriefService {
         subjectBriefMapper.insert(subjectBrief);
     }
 
+    /**
+     * 根据题目id查询简答题具体信息
+     * @param subjectId
+     * @return
+     */
+    @Override
+    public SubjectBrief queryBrief(int subjectId) {
+        SubjectBrief subjectBrief = subjectBriefMapper.queryBrief(subjectId);
+        return subjectBrief;
+    }
+
 }

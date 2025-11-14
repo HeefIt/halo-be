@@ -194,4 +194,18 @@
         WHERE id = #{id}
     </select>
 
+    <!--查询简答题详情信息-->
+    <select id="queryBrief" resultType="com.heef.halo.domain.basic.entity.SubjectBrief">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_brief
+        <where>
+            <if test="subjectId != null and subjectId != ''">
+                AND subject_id = #{subjectId}
+            </if>
+            AND is_deleted = 0
+        </where>
+        ORDER BY id DESC
+    </select>
+
 </mapper>
