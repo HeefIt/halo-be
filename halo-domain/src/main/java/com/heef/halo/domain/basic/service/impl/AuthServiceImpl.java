@@ -112,6 +112,10 @@ public class AuthServiceImpl implements AuthService {
         if (StringUtils.isBlank(authUserEntity.getPassword())) {
             authUserEntity.setPassword("123456");
         }
+        //设置默认头像
+        if(authUserEntity.getAvatar()==null){
+            authUserEntity.setAvatar("http://117.72.10.84:9000/user/icon/微信图片_20231203153718(1).png");
+        }
         authUserEntity.setIsDeleted(0);
         authUserEntity.setStatus(0);
         //2.插入数据库

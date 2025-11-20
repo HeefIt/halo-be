@@ -1,21 +1,20 @@
 package com.heef.halo.domain.basic.service.impl;
 
 import com.google.common.base.Preconditions;
-import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
+import com.heef.halo.domain.basic.dto.staticDTO.DailyStatisticsDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.*;
 import com.heef.halo.domain.basic.entity.*;
 import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandler;
 import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandlerFactory;
 import com.heef.halo.domain.basic.mapper.*;
-import com.heef.halo.domain.basic.service.ShareService;
 import com.heef.halo.domain.basic.service.SubjectService;
 import com.heef.halo.domain.convert.SubjectCategoryConvert;
 import com.heef.halo.domain.convert.SubjectInfoConvert;
 import com.heef.halo.domain.convert.SubjectLabelConvert;
+import com.heef.halo.domain.convert.SubjectRecordConvert;
 import com.heef.halo.enums.IsDeleteFlagEnum;
 import com.heef.halo.result.PageResult;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +58,9 @@ public class SubjectServiceImpl implements SubjectService {
     private SubjectBriefMapper subjectBriefMapper;
     @Autowired
     private SubjectMappingMapper subjectMappingMapper;
+    
+    @Autowired
+    private SubjectRecordMapper subjectRecordMapper;
 
     @Autowired
     private SubjectTypeHandlerFactory subjectTypeHandlerFactory;
@@ -71,6 +73,9 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Autowired
     private SubjectInfoConvert subjectInfoConvert;
+    
+    @Autowired
+    private SubjectRecordConvert subjectRecordConvert;
 
 
     /**
@@ -144,6 +149,8 @@ public class SubjectServiceImpl implements SubjectService {
             throw new RuntimeException("传递的分类数据不能为空");
         }
         SubjectCategory convertEntity = subjectCategoryConvert.toEntity(subjectCategoryDTO);
+        //传递需要修改的数据
+        convertEntity.setId(id);
 
         int updated = subjectCategoryMapper.update(convertEntity);
         return updated != 0;
@@ -466,14 +473,24 @@ public class SubjectServiceImpl implements SubjectService {
         //获取分类id和标签id
         Integer categoryId = subjectInfoDTO.getCategoryId();
         Integer labelId = subjectInfoDTO.getLabelId();
+        List<Integer> labelIds = subjectInfoDTO.getLabelIds_query();
 
         //对象转换
         SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
 
         //查询数据库
-        List<SubjectInfo> subjectInfoList = subjectInfoMapper.selectPage2(subjectInfo, categoryId, labelId, offset, pageSize);
-
-        Long total = subjectInfoMapper.count2(subjectInfo, categoryId, labelId);
+        List<SubjectInfo> subjectInfoList;
+        Long total;
+        
+        // 如果传来了多个标签id，使用新方法
+        if (!CollectionUtils.isEmpty(labelIds)) {
+            subjectInfoList = subjectInfoMapper.selectPage3(subjectInfo, categoryId, labelIds, offset, pageSize);
+            total = subjectInfoMapper.count3(subjectInfo, categoryId, labelIds);
+        } else {
+            // 否则使用原来的方法
+            subjectInfoList = subjectInfoMapper.selectPage2(subjectInfo, categoryId, labelId, offset, pageSize);
+            total = subjectInfoMapper.count2(subjectInfo, categoryId, labelId);
+        }
 
         //对象转换返回
         List<SubjectInfoDTO> subjectInfoDTOList = subjectInfoConvert.toInfoDtoList(subjectInfoList);
@@ -525,5 +542,163 @@ public class SubjectServiceImpl implements SubjectService {
         return dto;
     }
 
+    /**
+     * 保存刷题记录
+     * @param subjectRecordDTO
+     * @return
+     */
+    @Override
+    public Boolean SaveRecord(SubjectRecordDTO subjectRecordDTO) {
+        // 对象转换
+        SubjectRecord subjectRecord = subjectRecordConvert.toRecordEntity(subjectRecordDTO);
+        
+        // 设置创建时间和更新时间
+        Date now = new Date();
+        if (subjectRecord.getCreateTime() == null) {
+            subjectRecord.setCreateTime(now);
+        }
+        subjectRecord.setUpdateTime(now);
+        
+        // 插入数据
+        int result = subjectRecordMapper.insert(subjectRecord);
 
+        return result > 0;
+    }
+    
+    /**
+     * 获取用户答题记录
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<SubjectRecordDTO> getRecordByUser(Long userId) {
+        List<SubjectRecord> recordList = subjectRecordMapper.getRecordByUser(userId);
+        List<SubjectRecordDTO> recordDTOList = subjectRecordConvert.toRecordDtoList(recordList);
+        
+        // 为每个记录添加题目信息
+        for (SubjectRecordDTO recordDTO : recordDTOList) {
+            // 查询题目信息
+            SubjectInfo subjectInfo = subjectInfoMapper.selectById(recordDTO.getSubjectId());
+            if (subjectInfo != null) {
+                recordDTO.setSubjectName(subjectInfo.getSubjectName());
+                
+                // 查询题目分类信息
+                SubjectMapping subjectMapping = new SubjectMapping();
+                subjectMapping.setSubjectId(recordDTO.getSubjectId());
+                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+                List<SubjectMapping> mappingList = subjectMappingMapper.queryMapping(subjectMapping);
+                
+                if (!CollectionUtils.isEmpty(mappingList)) {
+                    // 获取第一个分类ID
+                    Long categoryId = mappingList.get(0).getCategoryId();
+                    recordDTO.setCategoryId(categoryId);
+                    
+                    // 查询分类名称
+                    SubjectCategory category = subjectCategoryMapper.selectById(categoryId);
+                    if (category != null) {
+                        recordDTO.setCategoryName(category.getCategoryName());
+                    }
+                }
+            }
+        }
+        
+        return recordDTOList;
+    }
+
+    /**
+     * 获取题目答题记录
+     *
+     * @param subjectId
+     * @return
+     */
+    @Override
+    public List<SubjectRecordDTO> getRecordBySubject(Long subjectId) {
+        List<SubjectRecord> recordList = subjectRecordMapper.getRecordBySubject(subjectId);
+        List<SubjectRecordDTO> recordDTOList = subjectRecordConvert.toRecordDtoList(recordList);
+        
+        // 为每个记录添加题目信息
+        for (SubjectRecordDTO recordDTO : recordDTOList) {
+            // 查询题目信息
+            SubjectInfo subjectInfo = subjectInfoMapper.selectById(recordDTO.getSubjectId());
+            if (subjectInfo != null) {
+                recordDTO.setSubjectName(subjectInfo.getSubjectName());
+                
+                // 查询题目分类信息
+                SubjectMapping subjectMapping = new SubjectMapping();
+                subjectMapping.setSubjectId(recordDTO.getSubjectId());
+                subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+                List<SubjectMapping> mappingList = subjectMappingMapper.queryMapping(subjectMapping);
+                
+                if (!CollectionUtils.isEmpty(mappingList)) {
+                    // 获取第一个分类ID
+                    Long categoryId = mappingList.get(0).getCategoryId();
+                    recordDTO.setCategoryId(categoryId);
+                    
+                    // 查询分类名称
+                    SubjectCategory category = subjectCategoryMapper.selectById(categoryId);
+                    if (category != null) {
+                        recordDTO.setCategoryName(category.getCategoryName());
+                    }
+                }
+            }
+        }
+        
+        return recordDTOList;
+    }
+    
+    /**
+     * 获取用户当日刷题统计
+     * 
+     * @param userId 用户ID
+     * @param date 指定日期
+     * @return 每日统计信息
+     */
+    @Override
+    public DailyStatisticsDTO getDailyStatistics(Long userId, Date date) {
+        // 计算当天的开始和结束时间
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date startTime = calendar.getTime();
+        
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
+        Date endTime = calendar.getTime();
+        
+        // 获取当天的刷题记录
+        List<SubjectRecord> dailyRecords = subjectRecordMapper.getDailyRecords(userId, startTime, endTime);
+        
+        // 统计数据
+        DailyStatisticsDTO dailyStats = new DailyStatisticsDTO();
+        dailyStats.setProblemCount(dailyRecords.size());
+        
+        int totalTime = 0;
+        int correctCount = 0;
+        int totalScore = 0;
+        
+        for (SubjectRecord record : dailyRecords) {
+            totalTime += record.getTimeCost() != null ? record.getTimeCost() : 0;
+            if (record.getIsCorrect() != null && record.getIsCorrect() == 1) {
+                correctCount++;
+            }
+            totalScore += record.getScore() != null ? record.getScore() : 0;
+        }
+        
+        dailyStats.setTotalTime(totalTime);
+        dailyStats.setTotalScore(totalScore);
+        
+        // 计算正确率
+        if (dailyRecords.size() > 0) {
+            double accuracy = (double) correctCount / dailyRecords.size() * 100;
+            dailyStats.setAccuracy(Math.round(accuracy * 100.0) / 100.0); // 保留两位小数
+        }
+        
+        return dailyStats;
+    }
 }

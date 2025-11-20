@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class SubjectRecord implements Serializable {
+public class SubjectRecordDTO implements Serializable {
     private static final long serialVersionUID = -93489601141083217L;
     /**
      * 主键
@@ -57,5 +57,20 @@ public class SubjectRecord implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+    
+    /**
+     * 题目名称
+     */
+    private String subjectName;
+    
+    /**
+     * 分类ID
+     */
+    private Long categoryId;
+    
+    /**
+     * 分类名称
+     */
+    private String categoryName;
 
 }

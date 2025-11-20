@@ -1,11 +1,11 @@
 package com.heef.halo.domain.basic.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.fastjson.JSON;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.SubjectRecordDTO;
 import com.heef.halo.domain.basic.service.SubjectService;
 import com.heef.halo.result.PageResult;
 import com.heef.halo.result.Result;
@@ -127,10 +127,10 @@ public class SubjectController {
 
 
     /**
-     * 查询分类下大类就是把分类全部查出来父分类--子分类) 根据父分类id查询子分类
-     *
-     * @param subjectCategoryDTO
-     * @return
+     *      * 查询分类下大类就是把分类全部查出来父分类--子分类) 根据父分类id查询子分类
+     *      *
+     *      * @param subjectCategoryDTO
+     *      * @return
      */
     @PostMapping("/category/selectCategoryByPrimary")
     public Result<List<SubjectCategoryDTO>> selectPage(@RequestBody SubjectCategoryDTO subjectCategoryDTO) {
@@ -381,7 +381,76 @@ public class SubjectController {
         }
     }
 
+    /*---------------------------------------------------刷题模块-----------------------------------------------------------*/
+    /*---------------------------------------------------刷题模块-----------------------------------------------------------*/
+    /*---------------------------------------------------刷题模块-----------------------------------------------------------*/
 
+    /**
+     * 保存刷题记录
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/record/SaveRecord")
+    public Result<Boolean> SaveRecord(@RequestBody SubjectRecordDTO subjectRecordDTO) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.addRecord.dto: {}", JSON.toJSONString(subjectRecordDTO));
+            }
+            Boolean result = subjectService.SaveRecord(subjectRecordDTO);
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("保存刷题记录失败: {}", e.getMessage(), e);
+            return Result.fail("保存刷题记录失败:" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 获取用户答题记录
+     * (后续可以做排行榜(排行榜类型---总排行榜和今日排行榜)
+     * 1: 用户的回答正确率榜单[根据用用户的答题记录得分],
+     * 2: 题目的热门榜单[题目的被回答次数],
+     * 3: 用户的刷题次数榜单[刷题狂魔])
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("/record/getRecordByUser")
+    public Result<List<SubjectRecordDTO>> getRecordByUser(@RequestParam Long userId) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.getRecordByUser.userId: {}", userId);
+            }
+            List<SubjectRecordDTO> recordList = subjectService.getRecordByUser(userId);
+            return Result.ok(recordList);
+        } catch (Exception e) {
+            log.error("获取用户答题记录失败: {}", e.getMessage(), e);
+            return Result.fail("获取用户答题记录失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取题目答题记录
+     * (后续可以做排行榜(排行榜类型---总排行榜和今日排行榜)
+     * 1: 用户的回答正确率榜单[根据用用户的答题记录得分],
+     * 2: 题目的热门榜单[题目的被回答次数],
+     * 3: 用户的刷题次数榜单[刷题狂魔])
+     * @param subjectId
+     * @return
+     */
+    @GetMapping("/record/getRecordBySubject")
+    public Result<List<SubjectRecordDTO>> getRecordBySubject(@RequestParam Long subjectId) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.getRecordBySubject.subjectId: {}", subjectId);
+            }
+            List<SubjectRecordDTO> recordList = subjectService.getRecordBySubject(subjectId);
+            return Result.ok(recordList);
+        } catch (Exception e) {
+            log.error("获取题目答题记录失败: {}", e.getMessage(), e);
+            return Result.fail("获取题目答题记录失败:" + e.getMessage());
+        }
+    }
 
 
 }

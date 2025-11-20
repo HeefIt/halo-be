@@ -124,4 +124,25 @@ public interface SubjectInfoMapper {
      * @return
      */
     Long count2(@Param("subjectInfo") SubjectInfo subjectInfo, @Param("categoryId") Integer categoryId, @Param("labelId") Integer labelId);
+
+    /**
+     * 分页查询题目列表(面向用户)-支持多标签
+     * @param subjectInfo
+     * @param categoryId
+     * @param labelIds
+     * @param offset
+     * @param pageSize
+     * @return
+     */
+    List<SubjectInfo> selectPage3(@Param("subjectInfo") SubjectInfo subjectInfo, @Param("categoryId") Integer categoryId, 
+                                 @Param("labelIds") List<Integer> labelIds, @Param("offset") int offset, @Param("pageSize") Integer pageSize);
+
+    /**
+     * 统计题目总数(面向用户)-支持多标签
+     * @param subjectInfo
+     * @param categoryId
+     * @param labelIds
+     * @return
+     */
+    Long count3(@Param("subjectInfo") SubjectInfo subjectInfo, @Param("categoryId") Integer categoryId, @Param("labelIds") List<Integer> labelIds);
 }

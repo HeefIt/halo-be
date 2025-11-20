@@ -352,4 +352,66 @@
         </where>
     </select>
 
+    <!--条件多表查询当前页题目数据-支持多标签-->
+    <select id="selectPage3" resultType="com.heef.halo.domain.basic.entity.SubjectInfo">
+        SELECT DISTINCT si.*
+        FROM subject_info si
+        LEFT JOIN subject_mapping sm ON si.id = sm.subject_id AND sm.is_deleted = 0
+        <where>
+            si.is_deleted = 0
+            <if test="subjectInfo != null">
+                <if test="subjectInfo.subjectName != null and subjectInfo.subjectName != ''">
+                    AND si.subject_name LIKE CONCAT('%', #{subjectInfo.subjectName}, '%')
+                </if>
+                <if test="subjectInfo.subjectDifficult != null">
+                    AND si.subject_difficult = #{subjectInfo.subjectDifficult}
+                </if>
+                <if test="subjectInfo.subjectType != null">
+                    AND si.subject_type = #{subjectInfo.subjectType}
+                </if>
+            </if>
+            <if test="categoryId != null and categoryId != -1">
+                AND sm.category_id = #{categoryId}
+            </if>
+            <if test="labelIds != null and labelIds.size() > 0">
+                AND sm.label_id IN
+                <foreach collection="labelIds" item="labelId" open="(" separator="," close=")">
+                    #{labelId}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY si.id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!--条件多表统计题目数据总数-支持多标签-->
+    <select id="count3" resultType="java.lang.Long">
+        SELECT COUNT(DISTINCT si.id)
+        FROM subject_info si
+        LEFT JOIN subject_mapping sm ON si.id = sm.subject_id AND sm.is_deleted = 0
+        <where>
+            si.is_deleted = 0
+            <if test="subjectInfo != null">
+                <if test="subjectInfo.subjectName != null and subjectInfo.subjectName != ''">
+                    AND si.subject_name LIKE CONCAT('%', #{subjectInfo.subjectName}, '%')
+                </if>
+                <if test="subjectInfo.subjectDifficult != null">
+                    AND si.subject_difficult = #{subjectInfo.subjectDifficult}
+                </if>
+                <if test="subjectInfo.subjectType != null">
+                    AND si.subject_type = #{subjectInfo.subjectType}
+                </if>
+            </if>
+            <if test="categoryId != null and categoryId != -1">
+                AND sm.category_id = #{categoryId}
+            </if>
+            <if test="labelIds != null and labelIds.size() > 0">
+                AND sm.label_id IN
+                <foreach collection="labelIds" item="labelId" open="(" separator="," close=")">
+                    #{labelId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
 </mapper>

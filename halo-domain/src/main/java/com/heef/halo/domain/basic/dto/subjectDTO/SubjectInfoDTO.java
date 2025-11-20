@@ -78,6 +78,11 @@ public class SubjectInfoDTO implements Serializable {
     private Integer labelId;
 
     /**
+     * 标签id列表 (查询多个标签的时候使用)
+     */
+    private List<Integer> labelIds_query;
+
+    /**
      * 标签名字
      */
     private List<String> labelName;

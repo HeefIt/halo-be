@@ -339,6 +339,7 @@
         </where>
     </select>
 
+
     <!--设置用户状态-->
     <update id="setStatus" >
         update auth_user
@@ -349,5 +350,16 @@
         </set>
             where id=#{id}
     </update>
+
+    <!--统计状态status为0的用户数量-->
+    <select id="countOnlineUsers" resultType="java.lang.Long">
+        select count(*)
+        from auth_user
+        <where>
+            <if test="status!=null">
+                status=#{status}
+            </if>
+        </where>
+    </select>
 
 </mapper>

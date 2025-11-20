@@ -121,4 +121,11 @@ public interface AuthUserMapper extends BaseMapper<AuthUser> {
      * @return
      */
     Boolean setStatus(Long id, Integer status);
+
+    /**
+     * 查询在线用户(status状态为0的用户)
+     * @param onlineUserParam
+     * @return
+     */
+    Long countOnlineUsers(AuthUser onlineUserParam);
 }
