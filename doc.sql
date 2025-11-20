@@ -1157,3 +1157,19 @@ INSERT INTO `subject_radio` (`id`, `subject_id`, `option_type`, `option_content`
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+    -- 刷题记录表
+CREATE TABLE `subject_record` (
+                                  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                  `user_id` bigint NOT NULL COMMENT '用户ID',
+                                  `subject_id` bigint NOT NULL COMMENT '题目ID',
+                                  `user_answer` text COMMENT '用户答案',
+                                  `is_correct` tinyint(1) NOT NULL COMMENT '是否正确(0:错误,1:正确)',
+                                  `answer_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '答题时间',
+                                  `time_cost` int DEFAULT NULL COMMENT '答题耗时(秒)',
+                                  `score` int DEFAULT NULL COMMENT '题目得分',
+                                  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

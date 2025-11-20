@@ -1,10 +1,13 @@
 package com.heef.halo.domain.basic.service;
 
+import com.heef.halo.domain.basic.dto.staticDTO.DailyStatisticsDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.SubjectRecordDTO;
 import com.heef.halo.result.PageResult;
 
+import java.util.Date;
 import java.util.List;
 
 public interface SubjectService {
@@ -133,4 +136,35 @@ public interface SubjectService {
     SubjectInfoDTO selectSubjectInfo(SubjectInfoDTO subjectInfoDTO);
 
 
+    /**
+     * 保存刷题记录
+     * @param subjectRecordDTO
+     * @return
+     */
+    Boolean SaveRecord(SubjectRecordDTO subjectRecordDTO);
+    
+    /**
+     * 获取用户答题记录
+     *
+     * @param userId
+     * @return
+     */
+    List<SubjectRecordDTO> getRecordByUser(Long userId);
+
+    /**
+     * 获取题目答题记录
+     *
+     * @param subjectId
+     * @return
+     */
+    List<SubjectRecordDTO> getRecordBySubject(Long subjectId);
+    
+    /**
+     * 获取用户当日刷题统计
+     * 
+     * @param userId 用户ID
+     * @param date 指定日期
+     * @return 每日统计信息
+     */
+    DailyStatisticsDTO getDailyStatistics(Long userId, Date date);
 }
