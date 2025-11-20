@@ -53,6 +53,7 @@ public class BriefTypeHandler implements SubjectTypeHandler {
         }
         //对象转换---存subjectAnswer字段
         //这里可以直接转换是因为SubjectInfoDTO中有subjectAnswer字段，而SubjectBrief实体也有对应的subjectAnswer字段，所以可以直接通过MapStruct进行转换。
+        //本质传的就是answer字段
         SubjectBrief subjectBrief = subjectBriefConvert.toBriefEntity(subjectInfoDTO);
 
         subjectBrief.setSubjectId(id);//这里的id与实体类插入数据库的id不同;主要处理

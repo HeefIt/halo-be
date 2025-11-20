@@ -98,9 +98,10 @@ public interface SubjectLabelMapper {
     Boolean existsById(@Param("id") Long id);
 
     /**
-     * 根据标签id批量查询标签信息
+     * 根据标签idList批量查询标签信息
      * @param labelList
      * @return
      */
-    List<SubjectLabel> batchQueryLabel(List<Long> labelList);
+    List<SubjectLabel> queryLabelByLabelIdList(List<Long> labelList);
+
 }

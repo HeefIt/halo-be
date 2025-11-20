@@ -61,6 +61,11 @@ public class SubjectCategoryDTO implements Serializable {
     private Integer isDeleted;
 
     /**
+     * 分类下的题目数量
+     */
+    private  Integer subjectCount;
+
+    /**
      * 标签信息
      */
     private List<SubjectLabelDTO> labelDTOList;

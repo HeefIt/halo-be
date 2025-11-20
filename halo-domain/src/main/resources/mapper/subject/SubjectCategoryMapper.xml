@@ -220,4 +220,46 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 查询分类下大类 || 根据父类id查询所有子分类 || 子分类关联标签 -->
+    <select id="selectCategoryByParentId" resultType="com.heef.halo.domain.basic.entity.SubjectCategory">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_category
+        <where>
+            is_deleted = 0
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name = #{categoryName}
+            </if>
+            <if test="categoryType != null">
+                AND category_type = #{categoryType}
+            </if>
+            <if test="imageUrl != null and imageUrl != ''">
+                AND image_url = #{imageUrl}
+            </if>
+            <!-- 关键修改：去掉 parentId != '' 的判断 -->
+            <if test="parentId != null">
+                AND parent_id = #{parentId}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                AND created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                AND created_time = #{createdTime}
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                AND update_by = #{updateBy}
+            </if>
+            <if test="updateTime != null">
+                AND update_time = #{updateTime}
+            </if>
+            <if test="isDeleted != null">
+                AND is_deleted = #{isDeleted}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+
 </mapper>

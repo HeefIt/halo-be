@@ -96,4 +96,11 @@ public interface SubjectCategoryMapper {
      * @return 是否存在（true:存在, false:不存在）
      */
     Boolean existsById(@Param("id") Long id);
+
+    /**
+     * 根据父分类id查询子分类
+     * @param subjectCategory
+     * @return
+     */
+    List<SubjectCategory> selectCategoryByParentId(SubjectCategory subjectCategory);
 }

@@ -103,4 +103,18 @@ public interface SubjectMappingMapper {
      * @return
      */
     List<SubjectMapping> queryMapping(SubjectMapping subjectMapping);
+
+    /**
+     * 根据分类id查询对应的题目数量
+     * @param id
+     * @return
+     */
+    Integer querySubjectCount(Long id);
+
+    /**
+     * 根据分类idList查询关联表数据mapping
+     * @param categoryIds
+     * @return
+     */
+    List<SubjectMapping> queryMappingByCategoryIdList(List<Long> categoryIds);
 }

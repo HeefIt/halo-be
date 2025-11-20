@@ -207,7 +207,7 @@
     </select>
 
     <!--根据标签id批量查询标签信息-->
-    <select id="batchQueryLabel" resultType="com.heef.halo.domain.basic.entity.SubjectLabel">
+    <select id="queryLabelByLabelIdList" resultType="com.heef.halo.domain.basic.entity.SubjectLabel">
         select
         id, label_name, sort_num, created_by, created_time, update_by, update_time, is_deleted
         from subject_label

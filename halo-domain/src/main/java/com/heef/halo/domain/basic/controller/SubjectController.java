@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * subject-题目控制层
  *
@@ -120,6 +122,58 @@ public class SubjectController {
         } catch (Exception e) {
             log.error("删除分类失败:", e);
             return Result.fail("删除分类失败:" + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 查询分类下大类就是把分类全部查出来父分类--子分类) 根据父分类id查询子分类
+     *
+     * @param subjectCategoryDTO
+     * @return
+     */
+    @PostMapping("/category/selectCategoryByPrimary")
+    public Result<List<SubjectCategoryDTO>> selectPage(@RequestBody SubjectCategoryDTO subjectCategoryDTO) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.selectCategoryByPrimary.dto: {}"
+                        , JSON.toJSONString(subjectCategoryDTO));
+            }
+            List<SubjectCategoryDTO> subjectCategoryDTOList = subjectService.selectCategoryByPrimary(subjectCategoryDTO);
+            if (log.isInfoEnabled()) {
+                log.info("查询分类下大类: {}"
+                        , JSON.toJSONString(subjectCategoryDTOList));
+            }
+            return Result.ok(subjectCategoryDTOList);
+        } catch (Exception e) {
+            log.error("查询分类下大类接口: ", e);
+            return Result.fail("查询分类下大类: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 根据分类id--查询子分类及其标签(to user)
+     *
+     * @param subjectCategoryDTO
+     * @return
+     */
+    @PostMapping("/category/selectCategoryAndLabel")
+    public Result<List<SubjectCategoryDTO>> selectCategoryAndLabel(@RequestBody SubjectCategoryDTO subjectCategoryDTO) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.selectCategoryAndLabel.dto: {}"
+                        , JSON.toJSONString(subjectCategoryDTO));
+            }
+            List<SubjectCategoryDTO> subjectCategoryDTOList = subjectService.selectCategoryAndLabel(subjectCategoryDTO);
+            if (log.isInfoEnabled()) {
+                log.info("controller: 根据分类id--查询子分类及其标签: {}"
+                        , JSON.toJSONString(subjectCategoryDTOList));
+            }
+            return Result.ok(subjectCategoryDTOList);
+        } catch (Exception e) {
+            log.error("根据分类id--查询子分类及其标签接口: ", e);
+            return Result.fail("根据分类id--查询子分类及其标签失败: " + e.getMessage());
         }
     }
 
@@ -234,9 +288,9 @@ public class SubjectController {
 
 
 
-/*---------------------------------------------------题目模块-----------------------------------------------------------*/
-/*---------------------------------------------------题目模块-----------------------------------------------------------*/
-/*---------------------------------------------------题目模块-----------------------------------------------------------*/
+    /*---------------------------------------------------题目模块-----------------------------------------------------------*/
+    /*---------------------------------------------------题目模块-----------------------------------------------------------*/
+    /*---------------------------------------------------题目模块-----------------------------------------------------------*/
 
     /**
      * 新增题目
@@ -293,8 +347,8 @@ public class SubjectController {
      */
     @GetMapping("/info/selectPageToUser")
     public Result<PageResult<SubjectInfoDTO>> selectSubjectPage2(SubjectInfoDTO subjectInfoDTO,
-                                                                @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
-                                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+                                                                 @RequestParam(name = "pageNum", defaultValue = "1") Integer pageNum,
+                                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
         try {
             if (log.isInfoEnabled()) {
                 log.info("SubjectController.selectSubjectPage2.subjectInfoDTO: {}", JSON.toJSONString(subjectInfoDTO));
@@ -326,6 +380,8 @@ public class SubjectController {
             return Result.fail("查看题目详情失败:" + e.getMessage());
         }
     }
+
+
 
 
 }

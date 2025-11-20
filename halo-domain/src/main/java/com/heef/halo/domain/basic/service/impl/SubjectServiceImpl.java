@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.service.impl;
 
+import com.google.common.base.Preconditions;
 import com.heef.halo.domain.basic.dto.authDTO.AuthUserDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.*;
 import com.heef.halo.domain.basic.entity.*;
@@ -20,8 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -161,6 +161,120 @@ public class SubjectServiceImpl implements SubjectService {
         return deleted != 0;
     }
 
+
+    /**
+     * 查询分类下大类(根据父分类id查询子分类)
+     *
+     * @param subjectCategoryDTO
+     * @return
+     */
+    @Override
+    public List<SubjectCategoryDTO> selectCategoryByPrimary(SubjectCategoryDTO subjectCategoryDTO) {
+        Preconditions.checkNotNull(subjectCategoryDTO.getParentId(), "父级id不能为空");
+
+        //对象转换
+        SubjectCategory subjectCategory = subjectCategoryConvert.toEntity(subjectCategoryDTO);
+        subjectCategory.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+
+        //查询数据库
+        List<SubjectCategory> subjectCategoryList = subjectCategoryMapper.selectCategoryByParentId(subjectCategory);
+
+        //查询出来的list转换返回
+        List<SubjectCategoryDTO> subjectCategoryConvertDtoList = subjectCategoryConvert.toDtoList(subjectCategoryList);
+
+        //顺便把该分类下有多少题目都查询出来--根据查询出来的分类id到关联表查询题目数量
+        subjectCategoryConvertDtoList.forEach(dto -> {
+            Integer subjectCount = subjectMappingMapper.querySubjectCount(dto.getId());
+            dto.setSubjectCount(subjectCount);
+        });
+
+        return subjectCategoryConvertDtoList;
+    }
+
+    /**
+     * 查询分类下大类及其标签
+     *
+     *
+     * 1:查询分类列表 首先根据传入的父分类ID查询所有子分类：
+     * 2:查询标签信息 对每个分类查询其关联的标签信息
+     * 3:查询标签详细信息的具体实现
+     *   3.1查询中间表：根据分类ID查询 SubjectMapping 表获取关联的标签ID列表
+     *   3.2提取标签ID：从中间表结果中提取所有标签ID
+     *   3.3批量查询标签：根据标签ID列表批量查询标签详细信息
+     * 4:关联分类和标签 最后将查询到的标签信息关联到对应的分类上
+     *
+     * @param subjectCategoryDTO
+     * @return
+     */
+    @Override
+    public List<SubjectCategoryDTO> selectCategoryAndLabel(SubjectCategoryDTO subjectCategoryDTO) {
+        // 校验
+        Preconditions.checkNotNull(subjectCategoryDTO.getId(), "分类id不能为空");
+
+        // 根据当前分类ID查询所有子分类
+        subjectCategoryDTO.setParentId(subjectCategoryDTO.getId());
+        subjectCategoryDTO.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+        // 对象转换
+        SubjectCategory subjectCategory = subjectCategoryConvert.toEntity(subjectCategoryDTO);
+        //对象转换时保留了 id 字段，导致 SQL 查询条件变成了既要 id=1 又要 parent_id=1，这样的记录通常不存在。
+        subjectCategory.setId(null);
+
+        // 查询出所有子分类
+        List<SubjectCategory> subjectCategoryList = subjectCategoryMapper.selectCategoryByParentId(subjectCategory);
+        log.info("查询子分类数据列表:{}", subjectCategoryList);
+
+        // 如果查询结果为空，直接返回空列表
+        if (CollectionUtils.isEmpty(subjectCategoryList)) {
+            return new ArrayList<>();
+        }
+
+        // 提取所有分类ID
+        List<Long> categoryIds = subjectCategoryList.stream()
+                .map(SubjectCategory::getId)
+                .collect(Collectors.toList());
+
+        // 根据分类ID列表查询关联表数据
+        List<SubjectMapping> mappingList = subjectMappingMapper.queryMappingByCategoryIdList(categoryIds);
+
+        // 按分类ID分组标签ID
+        Map<Long, List<Long>> categoryIdToLabelIdsMap = mappingList.stream()
+                .collect(Collectors.groupingBy(
+                        SubjectMapping::getCategoryId,
+                        Collectors.mapping(SubjectMapping::getLabelId, Collectors.toList())
+                ));
+
+        // 查询所有涉及的标签信息
+        List<Long> labelIds = mappingList.stream()
+                .map(SubjectMapping::getLabelId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<SubjectLabel> labelList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(labelIds)) {
+            labelList = subjectLabelMapper.queryLabelByLabelIdList(labelIds);
+        }
+
+        // 按标签ID建立映射
+        Map<Long, SubjectLabel> labelIdToLabelMap = labelList.stream()
+                .collect(Collectors.toMap(SubjectLabel::getId, label -> label));
+
+        // 将标签信息关联到分类上
+        List<SubjectCategoryDTO> result = subjectCategoryConvert.toDtoList(subjectCategoryList);
+        result.forEach(categoryDTO -> {
+            List<Long> labelIdList = categoryIdToLabelIdsMap.getOrDefault(categoryDTO.getId(), new ArrayList<>());
+            // 去除重复的标签ID
+            List<Long> distinctLabelIdList = labelIdList.stream().distinct().collect(Collectors.toList());
+            List<SubjectLabelDTO> labelDTOList = distinctLabelIdList.stream()
+                    .map(labelIdToLabelMap::get)
+                    .filter(Objects::nonNull)
+                    .map(subjectLabelConvert::toLabelDto)
+                    .collect(Collectors.toList());
+            categoryDTO.setLabelDTOList(labelDTOList);
+        });
+
+        return result;
+    }
+
     /**
      * 新增题目标签
      *
@@ -269,9 +383,9 @@ public class SubjectServiceImpl implements SubjectService {
         //3. 插入数据到题目info总主表
         int inserted = subjectInfoMapper.insert(subjectInfo);
 
-        //4.使用策略工厂处理不同题型插入
+        //4.使用策略工厂处理不同题型插入(传枚举题型--工厂根据类型造数据)
         SubjectTypeHandler subjectTypeHandler = subjectTypeHandlerFactory.getHandler(subjectInfoDTO.getSubjectType());
-        subjectInfoDTO.setId(Math.toIntExact(subjectInfo.getId()));// 解决题目id没有插入到对应题目类型表的subjectId的问题
+        subjectInfoDTO.setId(Math.toIntExact(subjectInfo.getId())); //将主表id同步到具体类型表
         subjectTypeHandler.addSubject(subjectInfo.getId(), subjectInfoDTO);
 
         //5. 获取插入数据的id,来同步到从表(关联表)mapping
@@ -280,7 +394,7 @@ public class SubjectServiceImpl implements SubjectService {
         //6. 在mapping处理分类关联
         List<Integer> categoryIds = subjectInfoDTO.getCategoryIds();
         List<Integer> labelIds = subjectInfoDTO.getLabelIds();
-        //7. 数据封装
+        //7. 数据封装(聚合添加--一条数据对应一组分类/标签)
         List<SubjectMapping> mappingList = new LinkedList<>();
         categoryIds.forEach(categoryId -> {
             labelIds.forEach(labelId -> {
@@ -348,7 +462,7 @@ public class SubjectServiceImpl implements SubjectService {
     public PageResult<SubjectInfoDTO> selectSubjectPage2(SubjectInfoDTO subjectInfoDTO, Integer pageNum, Integer pageSize) {
         //计算起始offset
         int offset = (pageNum - 1) * pageSize;
-        
+
         //获取分类id和标签id
         Integer categoryId = subjectInfoDTO.getCategoryId();
         Integer labelId = subjectInfoDTO.getLabelId();
@@ -404,7 +518,7 @@ public class SubjectServiceImpl implements SubjectService {
         List<Long> labelList = subjectMappingList.stream().map(SubjectMapping::getLabelId).collect(Collectors.toList());
 
         //通过标签id查询对应的标签信息
-        List<SubjectLabel> subjectLabelList = subjectLabelMapper.batchQueryLabel(labelList);
+        List<SubjectLabel> subjectLabelList = subjectLabelMapper.queryLabelByLabelIdList(labelList);
         List<String> labelNameList = subjectLabelList.stream().map(SubjectLabel::getLabelName).collect(Collectors.toList());
 
         dto.setLabelName(labelNameList);
