@@ -1,11 +1,15 @@
 package com.heef.halo.domain.basic.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.heef.halo.domain.basic.dto.fileDTO.FileDTO;
 import com.heef.halo.domain.basic.dto.fileDTO.FileResponseDTO;
+import com.heef.halo.domain.basic.entity.AuthUser;
 import com.heef.halo.domain.basic.entity.FileInfo;
+import com.heef.halo.domain.basic.mapper.AuthUserMapper;
 import com.heef.halo.domain.basic.mapper.FileInfoMapper;
 import com.heef.halo.domain.basic.service.MinioStorageFileService;
 import com.heef.halo.domain.config.MinioConfig;
+import com.heef.halo.domain.util.UserUtils;
 import io.minio.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +43,12 @@ public class MinioStorageFileServiceImpl implements MinioStorageFileService {
     
     @Autowired
     private FileInfoMapper fileInfoMapper;
+
+    @Autowired
+    private AuthUserMapper authUserMapper;
+
+    @Autowired
+    private UserUtils userUtils;
 
     /**
      * 上传文件
@@ -87,9 +97,11 @@ public class MinioStorageFileServiceImpl implements MinioStorageFileService {
             fileInfo.setFileSize(file.getSize());
             fileInfo.setFileType(fileType);
             fileInfo.setDescription(description);
-            fileInfo.setCreatedBy("system"); // 实际项目中应该从上下文中获取当前用户
+//            fileInfo.setCreatedBy("system"); // 实际项目中应该从上下文中获取当前用户
+            String loginId = (String) StpUtil.getLoginId();//获取当前登录用户的id
+            fileInfo.setCreatedBy(userUtils.getUserName(loginId));
             fileInfo.setCreatedTime(new Date());
-            fileInfo.setUpdateBy("system");
+            fileInfo.setCreatedBy(userUtils.getUserName(loginId));
             fileInfo.setUpdateTime(new Date());
             fileInfo.setIsDeleted(0);
             
@@ -166,9 +178,16 @@ public class MinioStorageFileServiceImpl implements MinioStorageFileService {
             fileInfo.setFileSize(image.getSize());
             fileInfo.setFileType(fileType);
             fileInfo.setDescription(description);
-            fileInfo.setCreatedBy("system");
+            String loginId = (String) StpUtil.getLoginId();//获取当前登录用户的id
+            fileInfo.setCreatedBy(userUtils.getUserName(loginId));
+
+//            fileInfo.setCreatedBy("system");
             fileInfo.setCreatedTime(new Date());
-            fileInfo.setUpdateBy("system");
+
+//            fileInfo.setUpdateBy("system");
+
+            fileInfo.setUpdateBy(userUtils.getUserName(loginId));
+
             fileInfo.setUpdateTime(new Date());
             fileInfo.setIsDeleted(0);
             
@@ -310,4 +329,16 @@ public class MinioStorageFileServiceImpl implements MinioStorageFileService {
             throw new RuntimeException("检查或创建bucket失败: " + e.getMessage());
         }
     }
+
+
+//    /**
+//     * 根据登录用户id获取用户名称
+//     * @param LoginId
+//     * @return
+//     */
+//    private String uploadUserName(String LoginId){
+//        AuthUser authUser = authUserMapper.selectById(LoginId);
+//        String userName = authUser.getUserName();
+//        return userName;
+//    }
 }

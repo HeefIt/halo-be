@@ -1,9 +1,11 @@
 package com.heef.halo.domain.config.mybatisplus;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.heef.halo.domain.util.UserUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
@@ -20,11 +22,13 @@ import java.util.Date;
  * 4: FieldFill.DEFAULT	不填充
  *
  * @author heefM
- * @date 2025-
+ * @date 2025-11-21
  */
 @Slf4j
-@Component
 public class MyMetaObjectHandler implements MetaObjectHandler {
+
+    @Autowired
+    private UserUtils userUtils;
 
     /**
      * 插入时自动填充
@@ -33,14 +37,25 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         log.info("开始执行insert自动填充...");
-        // 自动填充创建时间
-        this.strictInsertFill(metaObject, "createdTime", Date.class, new Date());
-        // 自动填充更新时间
-        this.strictInsertFill(metaObject, "updateTime", Date.class, new Date());
-        // 自动填充创建人 (这里可以根据实际需求从上下文中获取当前用户)
-        // this.strictInsertFill(metaObject, "createdBy", String.class, getCurrentUser());
-        // 自动填充更新人
-        // this.strictInsertFill(metaObject, "updateBy", String.class, getCurrentUser());
+        try {
+            // 自动填充创建时间
+            this.strictInsertFill(metaObject, "createdTime", Date.class, new Date());
+            // 自动填充创建人
+            String currentUser = getCurrentUser();
+            this.strictInsertFill(metaObject, "createdBy", String.class, currentUser);
+            // 自动填充更新时间
+            this.strictInsertFill(metaObject, "updateTime", Date.class, new Date());
+            // 自动填充更新人
+            this.strictInsertFill(metaObject, "updateBy", String.class, currentUser);
+            
+            log.info("insert自动填充完成: createdTime={}, createdBy={}, updateTime={}, updateBy={}", 
+                metaObject.getValue("createdTime"), 
+                metaObject.getValue("createdBy"),
+                metaObject.getValue("updateTime"), 
+                metaObject.getValue("updateBy"));
+        } catch (Exception e) {
+            log.error("insert自动填充异常: ", e);
+        }
     }
 
     /**
@@ -50,27 +65,47 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         log.info("开始执行update自动填充...");
-        // 自动填充更新时间
-        this.strictUpdateFill(metaObject, "updateTime", Date.class, new Date());
-        // 自动填充更新人
-        // this.strictUpdateFill(metaObject, "updateBy", String.class, getCurrentUser());
+        try {
+            // 自动填充更新时间
+            this.strictUpdateFill(metaObject, "updateTime", Date.class, new Date());
+            // 自动填充更新人
+            String currentUser = getCurrentUser();
+            this.strictUpdateFill(metaObject, "updateBy", String.class, currentUser);
+            
+            log.info("update自动填充完成: updateTime={}, updateBy={}", 
+                metaObject.getValue("updateTime"), 
+                metaObject.getValue("updateBy"));
+        } catch (Exception e) {
+            log.error("update自动填充异常: ", e);
+        }
     }
 
     /**
-     * 获取当前用户信息（示例方法）
+     * 获取当前用户信息
      * 实际使用时可根据项目认证方式获取当前用户
      * @return
      */
-    /*
     private String getCurrentUser() {
         try {
-            // 根据项目实际使用的认证框架获取当前用户
-            // 例如使用Sa-Token:
-            // return StpUtil.getLoginIdAsString();
-            return "system";
+            if (StpUtil.isLogin()) {
+                String loginId = StpUtil.getLoginIdAsString();
+                log.debug("获取到当前登录用户ID: {}", loginId);
+                if (userUtils != null) {
+                    String userName = userUtils.getUserName(loginId);
+                    log.debug("获取到用户名: {}", userName);
+                    return userName != null ? userName : "unknownUser";
+                } else {
+                    log.warn("UserUtils 未注入成功");
+                    return "system";
+                }
+            } else {
+                log.warn("用户未登录，使用默认值");
+                return "anonymous";
+            }
         } catch (Exception e) {
-            return "system";
+            log.error("获取当前用户信息异常: ", e);
+            return "exceptionSystem";
         }
     }
-    */
+
 }

@@ -61,12 +61,12 @@ public class SubjectInfo implements Serializable {
     /**
      * 修改人
      */
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
     /**
      * 修改时间
      */
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     private Integer isDeleted;

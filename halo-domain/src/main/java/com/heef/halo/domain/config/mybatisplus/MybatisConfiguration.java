@@ -26,4 +26,14 @@ public class MybatisConfiguration {
         return mybatisPlusInterceptor;
     }
 
+    /**
+     * 显式注册MetaObjectHandler Bean
+     * 保证MyBatis-Plus会发现我们的自动填充处理器
+     * @return
+     */
+    @Bean
+    public MyMetaObjectHandler myMetaObjectHandler() {
+        return new MyMetaObjectHandler();
+    }
+
 }

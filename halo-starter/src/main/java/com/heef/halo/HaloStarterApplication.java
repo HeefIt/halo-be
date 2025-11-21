@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @date 2025-10-31
  */
 @SpringBootApplication
+@ComponentScan("com.heef.halo")  // 确保扫描到所有组件
 @EnableCaching
 @EnableScheduling  //开启定时
 @Slf4j

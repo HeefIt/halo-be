@@ -2,6 +2,7 @@ package com.heef.halo.domain.basic.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
@@ -304,6 +305,8 @@ public class SubjectController {
             if (log.isInfoEnabled()) {
                 log.info("SubjectController.addSubject.subjectInfoDTO: {}", JSON.toJSONString(subjectInfoDTO));
             }
+            Preconditions.checkNotNull(subjectInfoDTO.getLabelIds(), "标签不能为空");
+            Preconditions.checkNotNull(subjectInfoDTO.getCategoryIds(), "分类不能为空");
             Boolean result = subjectService.addSubject(subjectInfoDTO);
             return Result.ok("新增题目结果为:" + result);
         } catch (Exception e) {

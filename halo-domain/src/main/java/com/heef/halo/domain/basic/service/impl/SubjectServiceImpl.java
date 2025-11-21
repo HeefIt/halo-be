@@ -410,9 +410,6 @@ public class SubjectServiceImpl implements SubjectService {
                 subjectMapping.setCategoryId(Long.valueOf(categoryId));
                 subjectMapping.setLabelId(Long.valueOf(labelId));
                 subjectMapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
-                // 添加创建人和更新人信息，避免数据库约束问题
-                subjectMapping.setCreatedBy("haloer");
-                subjectMapping.setUpdateBy("haloer");
                 mappingList.add(subjectMapping);
             });
         });

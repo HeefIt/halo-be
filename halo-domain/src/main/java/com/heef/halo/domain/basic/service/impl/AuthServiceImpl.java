@@ -118,6 +118,7 @@ public class AuthServiceImpl implements AuthService {
         }
         authUserEntity.setIsDeleted(0);
         authUserEntity.setStatus(0);
+        authUserEntity.setCreatedBy(authUserDTO.getUserName());//当前用户创建createBy
         //2.插入数据库
         int uCount = authUserMapper.insert(authUserEntity);
 

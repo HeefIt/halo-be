@@ -53,12 +53,12 @@ public class SubjectRadio implements Serializable {
     /**
      * 修改人
      */
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)  // 改为插入和更新都填充
     private String updateBy;
     /**
      * 修改时间
      */
-    @TableField(fill = FieldFill.UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)  // 改为插入和更新都填充
     private Date updateTime;
 
     private Integer isDeleted;
