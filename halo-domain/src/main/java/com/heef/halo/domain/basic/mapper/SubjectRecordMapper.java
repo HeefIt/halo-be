@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.SubjectRecord;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -14,7 +15,7 @@ import java.util.List;
  * @since 2025-11-20 11:32:33
  */
 @Mapper
-public interface SubjectRecordMapper {
+public interface SubjectRecordMapper extends BaseMapper<SubjectRecord> {
 
     /**
      * 通过ID查询单条数据

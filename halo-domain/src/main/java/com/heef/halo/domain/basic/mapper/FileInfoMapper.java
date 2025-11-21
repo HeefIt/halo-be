@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.FileInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +14,7 @@ import java.util.List;
  * @date 2025-11-07
  */
 @Mapper
-public interface FileInfoMapper {
+public interface FileInfoMapper extends BaseMapper<FileInfo> {
     
     /**
      * 插入文件信息

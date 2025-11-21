@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.PracticeDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +14,7 @@ import java.util.List;
  * @since 2025-10-31 16:47:46
  */
 @Mapper
-public interface PracticeDetailMapper {
+public interface PracticeDetailMapper extends BaseMapper<PracticeDetail> {
 
     /**
      * 分页查询练习详情表数据

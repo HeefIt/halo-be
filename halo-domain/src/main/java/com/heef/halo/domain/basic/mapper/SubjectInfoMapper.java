@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.SubjectInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +14,7 @@ import java.util.List;
  * @since 2025-10-31 16:47:51
  */
 @Mapper
-public interface SubjectInfoMapper {
+public interface SubjectInfoMapper extends BaseMapper<SubjectInfo> {
 
     /**
      * 分页查询题目信息表数据

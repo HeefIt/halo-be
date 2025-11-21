@@ -1,6 +1,7 @@
 package com.heef.halo;
 
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableScheduling  //开启定时
 @Slf4j
+@MapperScan("com.heef.halo.domain.basic.mapper")
 public class HaloStarterApplication {
 
     public static void main(String[] args) {

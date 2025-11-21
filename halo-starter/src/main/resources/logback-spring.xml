@@ -2,24 +2,29 @@
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
     <!-- 定义日志文件的存储地址 -->
     <property name="LOG_HOME" value="../log" />
+    
+    <!-- 定义彩色输出格式 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
 
-    <!-- 控制台输出 -->
+    <!-- 控制台输出 - 带颜色 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <!-- 标准日志格式 -->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <!-- 彩色日志格式：时间戳 日志级别(彩色) PID 线程名 类名 消息 -->
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %clr(%-5level){cyan,debug=false} %clr([%-15thread]){magenta} %clr(%-40logger{40}){cyan} %clr(:){faint} %msg%n%wEx</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <!-- 文件输出 -->
+    <!-- 文件输出 - 不带颜色 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${LOG_HOME}/halo.log.%d{yyyy-MM-dd}.log</FileNamePattern>
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%-15thread] %-40logger{40} : %msg%n%wEx</pattern>
             <charset>UTF-8</charset>
         </encoder>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
@@ -32,4 +37,9 @@
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>
+    
+    <!-- 针对特定包的日志级别配置 -->
+    <logger name="com.heef.halo" level="DEBUG" />
+    <logger name="org.springframework.web" level="INFO" />
+    <logger name="org.springframework.boot" level="INFO" />
 </configuration>

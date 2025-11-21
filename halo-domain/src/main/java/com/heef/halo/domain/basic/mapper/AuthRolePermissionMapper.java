@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.AuthRolePermission;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +14,7 @@ import java.util.List;
  * @since 2025-10-31 16:47:44
  */
 @Mapper
-public interface AuthRolePermissionMapper {
+public interface AuthRolePermissionMapper extends BaseMapper<AuthRolePermission> {
 
     /**
      * 分页查询角色权限关联表数据

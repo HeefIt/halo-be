@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.SubjectMultiple;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -13,7 +14,7 @@ import java.util.List;
  * @since 2025-10-31 16:47:52
  */
 @Mapper
-public interface SubjectMultipleMapper {
+public interface SubjectMultipleMapper extends BaseMapper<SubjectMultiple> {
 
     /**
      * 分页查询多选题信息表数据
