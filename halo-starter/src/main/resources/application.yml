@@ -102,7 +102,7 @@ minio:
   endpoint: http://192.168.171.100:9000  # MinIO服务地址
   access-key: admin           # 默认access key
   secret-key: huang040318           # 默认secret key
-  bucket-name: blog-bucket         # 存储桶名称
+  bucket-name: halo                # 存储桶名称
   secure: false                    # 是否使用HTTPS
 
 # Nacos配置（已注释）

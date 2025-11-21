@@ -59,8 +59,8 @@ public class MinioStorageFileServiceImpl implements MinioStorageFileService {
             String originalFileName = file.getOriginalFilename();
             String fileType = file.getContentType();
 
-            // 生成唯一文件名
-            String uniqueFileName = generateUniqueFileName(originalFileName);
+            // 生成唯一文件名（file路径前缀）
+            String uniqueFileName = "file/" + generateUniqueFileName(originalFileName);
 
             // 确保bucket存在
             createBucketIfNotExists();
@@ -122,13 +122,74 @@ public class MinioStorageFileServiceImpl implements MinioStorageFileService {
      */
     @Override
     public FileDTO uploadImage(MultipartFile image, String description) {
-        // 检查是否为图片文件
-        String contentType = image.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new RuntimeException("只允许上传图片文件");
-        }
+        try {
+            // 检查文件是否为空
+            if (image == null || image.isEmpty()) {
+                throw new RuntimeException("文件不能为空");
+            }
 
-        return uploadFile(image, description);
+            // 检查是否为图片文件
+            String contentType = image.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new RuntimeException("只允许上传图片文件");
+            }
+
+            // 获取文件名和文件类型
+            String originalFileName = image.getOriginalFilename();
+            String fileType = image.getContentType();
+
+            // 生成唯一文件名（avatar路径前缀）
+            String uniqueFileName = "avatar/" + generateUniqueFileName(originalFileName);
+
+            // 确保bucket存在
+            createBucketIfNotExists();
+
+            // 上传文件到MinIO
+            try (InputStream inputStream = image.getInputStream()) {
+                minioClient.putObject(
+                        PutObjectArgs.builder()
+                                .bucket(minioConfig.getBucketName())
+                                .object(uniqueFileName)
+                                .stream(inputStream, image.getSize(), -1)
+                                .contentType(fileType)
+                                .build()
+                );
+            }
+
+            // 构建文件访问路径
+            String filePath = minioConfig.getEndpoint() + "/" + minioConfig.getBucketName() + "/" + uniqueFileName;
+
+            // 保存文件信息到数据库
+            FileInfo fileInfo = new FileInfo();
+            fileInfo.setFileName(originalFileName);
+            fileInfo.setFilePath(filePath);
+            fileInfo.setFileSize(image.getSize());
+            fileInfo.setFileType(fileType);
+            fileInfo.setDescription(description);
+            fileInfo.setCreatedBy("system");
+            fileInfo.setCreatedTime(new Date());
+            fileInfo.setUpdateBy("system");
+            fileInfo.setUpdateTime(new Date());
+            fileInfo.setIsDeleted(0);
+            
+            fileInfoMapper.insert(fileInfo);
+
+            // 构建返回结果
+            FileDTO fileDTO = new FileDTO();
+            fileDTO.setId(fileInfo.getId());
+            fileDTO.setFileName(originalFileName);
+            fileDTO.setFilePath(filePath);
+            fileDTO.setFileSize(image.getSize());
+            fileDTO.setFileType(fileType);
+            fileDTO.setDescription(description);
+            fileDTO.setCreatedBy("system");
+            fileDTO.setCreatedTime(new Date());
+
+            return fileDTO;
+        } catch (Exception e) {
+            log.error("图片上传失败", e);
+            throw new RuntimeException("图片上传失败: " + e.getMessage());
+        }
     }
 
     /**
