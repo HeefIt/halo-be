@@ -128,4 +128,11 @@ public interface AuthUserMapper extends BaseMapper<AuthUser> {
      * @return
      */
     Long countOnlineUsers(AuthUser onlineUserParam);
+    
+    /**
+     * 获取用户增长趋势数据
+     * @param days 天数（7或30）
+     * @return 趋势数据列表
+     */
+    List<java.util.Map<String, Object>> getUserGrowthTrend(@Param("days") int days);
 }

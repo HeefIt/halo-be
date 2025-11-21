@@ -362,4 +362,16 @@
         </where>
     </select>
 
+    <!--获取用户增长趋势-->
+    <select id="getUserGrowthTrend" resultType="java.util.Map">
+        SELECT 
+            DATE_FORMAT(created_time, '%Y-%m-%d') as date,
+            COUNT(*) as count
+        FROM auth_user
+        WHERE is_deleted = 0
+        AND created_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        GROUP BY DATE_FORMAT(created_time, '%Y-%m-%d')
+        ORDER BY date ASC
+    </select>
+
 </mapper>

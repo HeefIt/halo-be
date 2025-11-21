@@ -701,4 +701,26 @@ public class SubjectServiceImpl implements SubjectService {
         
         return dailyStats;
     }
+    
+    /**
+     * 获取用户已解决的题目数量
+     * 
+     * @param userId 用户ID
+     * @return 已解决的题目数量
+     */
+    @Override
+    public int getSolvedProblemsCount(Long userId) {
+        return subjectRecordMapper.countSolvedProblems(userId);
+    }
+    
+    /**
+     * 获取用户尝试的题目数量
+     * 
+     * @param userId 用户ID
+     * @return 尝试的题目数量
+     */
+    @Override
+    public int getAttemptedProblemsCount(Long userId) {
+        return subjectRecordMapper.countAttemptedProblems(userId);
+    }
 }

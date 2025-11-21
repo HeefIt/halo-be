@@ -167,4 +167,20 @@ public interface SubjectService {
      * @return 每日统计信息
      */
     DailyStatisticsDTO getDailyStatistics(Long userId, Date date);
+    
+    /**
+     * 获取用户已解决的题目数量
+     * 
+     * @param userId 用户ID
+     * @return 已解决的题目数量
+     */
+    int getSolvedProblemsCount(Long userId);
+    
+    /**
+     * 获取用户尝试的题目数量
+     * 
+     * @param userId 用户ID
+     * @return 尝试的题目数量
+     */
+    int getAttemptedProblemsCount(Long userId);
 }

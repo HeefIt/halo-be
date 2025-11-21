@@ -451,6 +451,44 @@ public class SubjectController {
             return Result.fail("获取题目答题记录失败:" + e.getMessage());
         }
     }
-
-
+    
+    /**
+     * 获取用户已解决的题目数量
+     * 
+     * @param userId 用户ID
+     * @return 已解决的题目数量
+     */
+    @GetMapping("/record/getSolvedProblemsCount")
+    public Result<Integer> getSolvedProblemsCount(@RequestParam Long userId) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.getSolvedProblemsCount.userId: {}", userId);
+            }
+            int count = subjectService.getSolvedProblemsCount(userId);
+            return Result.ok(count);
+        } catch (Exception e) {
+            log.error("获取用户已解决题目数量失败: {}", e.getMessage(), e);
+            return Result.fail("获取用户已解决题目数量失败:" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 获取用户尝试的题目数量
+     * 
+     * @param userId 用户ID
+     * @return 尝试的题目数量
+     */
+    @GetMapping("/record/getAttemptedProblemsCount")
+    public Result<Integer> getAttemptedProblemsCount(@RequestParam Long userId) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.getAttemptedProblemsCount.userId: {}", userId);
+            }
+            int count = subjectService.getAttemptedProblemsCount(userId);
+            return Result.ok(count);
+        } catch (Exception e) {
+            log.error("获取用户尝试题目数量失败: {}", e.getMessage(), e);
+            return Result.fail("获取用户尝试题目数量失败:" + e.getMessage());
+        }
+    }
 }

@@ -107,4 +107,27 @@ public interface SubjectRecordMapper {
      * @return 答题记录列表
      */
     List<SubjectRecord> getDailyRecords(@Param("userId") Long userId, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+    
+    /**
+     * 统计用户已解决的题目数量（回答正确的题目）
+     * 
+     * @param userId 用户ID
+     * @return 已解决的题目数量
+     */
+    int countSolvedProblems(@Param("userId") Long userId);
+    
+    /**
+     * 统计用户尝试的题目数量（所有答题记录）
+     * 
+     * @param userId 用户ID
+     * @return 尝试的题目数量
+     */
+    int countAttemptedProblems(@Param("userId") Long userId);
+    
+    /**
+     * 获取题目提交趋势数据
+     * @param days 天数（7或30）
+     * @return 趋势数据列表
+     */
+    List<java.util.Map<String, Object>> getSubmissionTrend(@Param("days") int days);
 }
