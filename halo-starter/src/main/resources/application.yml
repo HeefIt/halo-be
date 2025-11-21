@@ -8,34 +8,24 @@ spring:
     name: club-subject
   profiles:
     active: dev
-    # config:
-    # import: optional:nacos:${spring.application.name}
 
   # 数据源配置
   datasource:
-    # 基础连接配置
     username: root
-    password: "1234"  # GuEFg+3vX50ExA6ZOTI7crf887ZLWJmEF3DvrN+JDrERgpp7dM1P6L4TjGb/BjP8KbIurA4Y5V8lWLZTfoSlzA==
+    password: "1234"
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/halo?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     type: com.alibaba.druid.pool.DruidDataSource
-
-    # Druid连接池配置
     druid:
-      # 连接池大小配置
       initial-size: 20
       min-idle: 20
       max-active: 100
       max-wait: 60000
-
-      # 监控配置
       stat-view-servlet:
         enabled: true
         url-pattern: /druid/*
         login-username: admin
         login-password: "123456"
-
-      # 过滤器配置
       filter:
         stat:
           enabled: true
@@ -49,13 +39,11 @@ spring:
   # Redis配置
   data:
     redis:
-      # 连接配置
       database: 15
       host: 192.168.171.100
       port: 6379
       password: "12321"
       timeout: 10s
-      # 连接池配置
       lettuce:
         pool:
           max-active: 200
@@ -67,54 +55,45 @@ spring:
   mybatis-plus:
     configuration:
       log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-      # 自动驼峰命名规则映射
       map-underscore-to-camel-case: true
-    # 字段策略配置
     global-config:
       db-config:
-        # 逻辑删除字段名
         logic-delete-field: isDeleted
-        # 逻辑删除值
         logic-delete-value: 1
-        # 逻辑未删除值
         logic-not-delete-value: 0
 
-################################################
-# Sa-Token 配置 (文档: https://sa-token.cc) #
-################################################
+  # Spring AI 配置 - DeepSeek
+  ai:
+    openai:
+      api-key: sk-cedfd52d67784675b6266b2b97a0f4cc
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
+          temperature: 0.7
+          max-tokens: 2048
+
+# Sa-Token 配置
 sa-token:
-  # token 名称（同时也是 cookie 名称）
   token-name: satoken
-  
-  # token 有效期（单位：秒） 默认30天，-1 代表永久有效
   timeout: 2592000
-  
-  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
   active-timeout: -1
-  
-  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
   is-concurrent: true
-  
-  # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
   is-share: false
-  
-  # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
   token-style: uuid
-  
-  # 是否输出操作日志
   is-log: true
 
 # 日志配置
 logging:
   config: classpath:logback-spring.xml
 
-  # MinIO客户端配置
+# MinIO配置
 minio:
-  endpoint: http://192.168.171.100:9000  # MinIO服务地址
-  access-key: admin           # 默认access key
-  secret-key: huang040318           # 默认secret key
-  bucket-name: halo                # 存储桶名称
-  secure: false                    # 是否使用HTTPS
+  endpoint: http://192.168.171.100:9000
+  access-key: admin
+  secret-key: huang040318
+  bucket-name: halo
+  secure: false
 
 # Nacos配置（已注释）
 #spring:

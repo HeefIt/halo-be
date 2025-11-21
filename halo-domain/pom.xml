@@ -45,10 +45,10 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- MyBatis Plus -->
+        <!-- MyBatis Plus spring-boot3(太关键了)-->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
         </dependency>
 
         <!-- Halo Common -->
@@ -100,6 +100,29 @@
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>8.5.7</version>
+        </dependency>
+
+<!--        &lt;!&ndash; DeepSeek &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-model-deepseek</artifactId>-->
+<!--            <version></version>-->
+<!--        </dependency>-->
+
+<!--        &lt;!&ndash;alibaba 百炼&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.alibaba.cloud.ai</groupId>-->
+<!--            <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>-->
+<!--            <version></version>-->
+<!--        </dependency>-->
+        <!-- Spring AI OpenAI Starter -->
+
+<!--        虽然我们前面提到本次使用的是 DeepSeek 的 API，但引入的却是 spring-ai-starter-model-openai。-->
+<!--        这是因为 DeepSeek 采用了与 OpenAI 完全兼容的 API 规范，我们可以直接复用 OpenAI 的客户端实现。-->
+<!--        这种设计让切换不同的 AI 服务商变得非常简单——只需要更换 API Key 和端点地址即可。-->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
         </dependency>
 
     </dependencies>
