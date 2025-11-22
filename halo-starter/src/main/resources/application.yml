@@ -62,6 +62,11 @@ spring:
         logic-delete-value: 1
         logic-not-delete-value: 0
 
+  # Jackson 配置 - 日期格式化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
   # Spring AI 配置 - DeepSeek
   ai:
     openai:

@@ -3,6 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!--springboot 版本-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -23,8 +24,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <!-- 🎯 老板规定所有依赖版本 -->
-        <mybatisplus.version>3.5.5</mybatisplus.version>
+        <!-- 🎯 老板规定所有依赖版本|| 项目依赖版本 -->
+        <mybatisplus.version>3.5.7</mybatisplus.version>
         <druid.version>1.2.20</druid.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <fastjson.version>2.0.43</fastjson.version>
@@ -45,7 +46,7 @@
     <!-- 🎯 老板的版本管理规定 -->
     <dependencyManagement>
         <dependencies>
-            <!-- MyBatis Plus -->
+            <!-- MyBatis Plus  我跟你说就是这个spring-boot3的问题搞得我排查了半天依赖问题-->
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
@@ -166,18 +167,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-
     </dependencies>
 
-<!--    <build>-->
-<!--        <pluginManagement>-->
-<!--            <plugins>-->
-<!--                <plugin>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                    <artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--                </plugin>-->
-<!--            </plugins>-->
-<!--        </pluginManagement>-->
-<!--    </build>-->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

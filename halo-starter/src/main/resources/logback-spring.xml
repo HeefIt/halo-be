@@ -8,38 +8,78 @@
     <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
     <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
 
-    <!-- 控制台输出 - 带颜色 -->
+    <!-- 控制台输出 - 带颜色(大厂风格) -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <!-- 彩色日志格式：时间戳 日志级别(彩色) PID 线程名 类名 消息 -->
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %clr(%-5level){cyan,debug=false} %clr([%-15thread]){magenta} %clr(%-40logger{40}){cyan} %clr(:){faint} %msg%n%wEx</pattern>
+            <!-- 大厂风格日志格式：
+                 %d: 时间戳
+                 %clr(): 彩色输出
+                 %level: 日志级别(INFO-青色,DEBUG-绿色,WARN-黄色,ERROR-红色)
+                 %thread: 线程名
+                 %logger: 类名
+                 %msg: 日志消息
+            -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5level){cyan,debug=green,info=cyan,warn=yellow,error=red} %clr([%thread]){faint} %clr(%logger{50}){cyan} %clr(-){faint} %msg%n%wEx</pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
 
-    <!-- 文件输出 - 不带颜色 -->
+    <!-- 文件输出 - 不带颜色(生产级) -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>${LOG_HOME}/halo.log.%d{yyyy-MM-dd}.log</FileNamePattern>
-            <MaxHistory>30</MaxHistory>
+        <file>${LOG_HOME}/halo.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 按日期和文件大小双重策略滚动 -->
+            <fileNamePattern>${LOG_HOME}/halo.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%-15thread] %-40logger{40} : %msg%n%wEx</pattern>
+            <!-- 生产级日志格式：清晰、结构化 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-20thread] %logger{50} - %msg%n%wEx</pattern>
             <charset>UTF-8</charset>
         </encoder>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>10MB</MaxFileSize>
-        </triggeringPolicy>
     </appender>
 
-    <!-- 日志输出级别 -->
+    <!-- =================================== 日志输出配置 =================================== -->
+    
+    <!-- 根日志级别 -->
     <root level="INFO">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>
     
-    <!-- 针对特定包的日志级别配置 -->
-    <logger name="com.heef.halo" level="DEBUG" />
+    <!-- ======= 业务模块日志配置 ======= -->
+    <!-- 项目业务代码 - DEBUG级别，便于开发调试 -->
+    <logger name="com.heef.halo.domain" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+    
+    <!-- 认证授权模块 - DEBUG级别 -->
+    <logger name="com.heef.halo.domain.basic.controller.AuthController" level="DEBUG" />
+    <logger name="com.heef.halo.domain.basic.service.AuthService" level="DEBUG" />
+    
+    <!-- 题目管理模块 - DEBUG级别 -->
+    <logger name="com.heef.halo.domain.basic.controller.SubjectController" level="DEBUG" />
+    <logger name="com.heef.halo.domain.basic.service.SubjectService" level="DEBUG" />
+    
+    <!-- ======= 第三方框架日志配置 ======= -->
+    <!-- Spring框架 - INFO级别 -->
+    <logger name="org.springframework" level="INFO" />
     <logger name="org.springframework.web" level="INFO" />
     <logger name="org.springframework.boot" level="INFO" />
+    
+    <!-- MyBatis - INFO级别 -->
+    <logger name="org.apache.ibatis" level="INFO" />
+    <logger name="com.mybatis" level="INFO" />
+    
+    <!-- 数据库连接 - WARN级别 -->
+    <logger name="com.zaxxer.hikari" level="WARN" />
+    <logger name="org.hibernate.validator" level="WARN" />
+    
+    <!-- Sa-Token安全框架 - INFO级别 -->
+    <logger name="cn.dev33.satoken" level="INFO" />
+    
+    <!-- JSON处理 - WARN级别 -->
+    <logger name="com.alibaba.fastjson" level="WARN" />
 </configuration>
