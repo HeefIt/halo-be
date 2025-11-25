@@ -1,5 +1,6 @@
 package com.heef.halo.domain.basic.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.base.Preconditions;
 import com.heef.halo.domain.basic.dto.staticDTO.DailyStatisticsDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.*;
@@ -530,14 +531,103 @@ public class SubjectServiceImpl implements SubjectService {
 
         //遍历subjectMappingList获取里面的标签id
         List<Long> labelList = subjectMappingList.stream().map(SubjectMapping::getLabelId).collect(Collectors.toList());
+        List<Integer> labelIdList = labelList.stream().map(Long::intValue).collect(Collectors.toList());
 
         //通过标签id查询对应的标签信息
         List<SubjectLabel> subjectLabelList = subjectLabelMapper.queryLabelByLabelIdList(labelList);
         List<String> labelNameList = subjectLabelList.stream().map(SubjectLabel::getLabelName).collect(Collectors.toList());
 
+        //获取分类ID列表
+        List<Long> categoryList = subjectMappingList.stream().map(SubjectMapping::getCategoryId).collect(Collectors.toList());
+        List<Integer> categoryIdList = categoryList.stream().map(Long::intValue).collect(Collectors.toList());
+
         dto.setLabelName(labelNameList);
+        dto.setLabelIds(labelIdList);
+        dto.setCategoryIds(categoryIdList);
         return dto;
     }
+
+    /**
+     * 编辑题目
+     * @param subjectInfoDTO
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean updateSubjectInfo(SubjectInfoDTO subjectInfoDTO) {
+        // 1. 验证题目是否存在
+        SubjectInfo subjectInfoEntity = subjectInfoMapper.selectById(subjectInfoDTO.getId());
+        if(subjectInfoEntity == null){
+            return false;
+        }
+
+        // 2. 更新题目基本信息
+        SubjectInfo subjectInfo = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+        int updated = subjectInfoMapper.updateById(subjectInfo); // 使用updateById
+        if(updated == 0) {
+            return false;
+        }
+
+        // 3. 处理关联关系 - 先删除后插入
+        // 查询现有的mapping关联数据
+        SubjectMapping queryMapping = new SubjectMapping();
+        queryMapping.setSubjectId(subjectInfoEntity.getId());
+        List<SubjectMapping> subjectMappingList = subjectMappingMapper.queryMapping(queryMapping);
+
+        // 根据关联id删除关联表信息
+        if (subjectMappingList != null && !subjectMappingList.isEmpty()) {
+            List<Long> mappingIds = subjectMappingList.stream()
+                    .map(SubjectMapping::getId)
+                    .collect(Collectors.toList());
+            subjectMappingMapper.deleteBatchIds(mappingIds); // 使用deleteBatchIds
+        }
+
+        // 4. 生成新的关联信息
+        if (subjectInfoDTO.getCategoryIds() != null && !subjectInfoDTO.getCategoryIds().isEmpty()
+                && subjectInfoDTO.getLabelIds() != null && !subjectInfoDTO.getLabelIds().isEmpty()) {
+
+            for (Integer categoryId : subjectInfoDTO.getCategoryIds()) {
+                for (Integer labelId : subjectInfoDTO.getLabelIds()) {
+                    SubjectMapping mapping = new SubjectMapping();
+                    mapping.setSubjectId(subjectInfoEntity.getId());
+                    mapping.setCategoryId(categoryId.longValue());
+                    mapping.setLabelId(labelId.longValue());
+                    mapping.setIsDeleted(IsDeleteFlagEnum.UN_DELETE.getCode());
+                    subjectMappingMapper.insert(mapping);
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 删除题目
+     * @param subjectInfoDTO
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean deleteSubject(SubjectInfoDTO subjectInfoDTO) {
+        SubjectInfo subjectInfo = subjectInfoMapper.selectById(subjectInfoDTO.getId());
+        if(subjectInfo==null){
+            return false;
+        }
+        //删除题目信息(info表)
+        SubjectInfo subjectInfoEntity = subjectInfoConvert.toInfoEntity(subjectInfoDTO);
+        subjectInfoMapper.deleteById(subjectInfoEntity.getId());
+
+        //根据subject_id删除关联表信息
+        SubjectMapping subjectMapping = new SubjectMapping();
+        subjectMapping.setSubjectId(subjectInfoEntity.getId());
+
+        List<SubjectMapping> subjectMappingList = subjectMappingMapper.queryMapping(subjectMapping);
+        List<Long> mappingIds = subjectMappingList.stream().map(SubjectMapping::getId).collect(Collectors.toList());
+
+        int deleted = subjectMappingMapper.deleteBatch(mappingIds);
+
+        return deleted!=0;
+    }
+
 
     /**
      * 保存刷题记录

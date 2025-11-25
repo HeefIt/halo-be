@@ -3,10 +3,7 @@ package com.heef.halo.domain.basic.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
-import com.heef.halo.domain.basic.dto.subjectDTO.SubjectRecordDTO;
+import com.heef.halo.domain.basic.dto.subjectDTO.*;
 import com.heef.halo.domain.basic.service.SubjectService;
 import com.heef.halo.result.PageResult;
 import com.heef.halo.result.Result;
@@ -381,6 +378,47 @@ public class SubjectController {
         } catch (Exception e) {
             log.error("查看题目详情失败: {}", e.getMessage(), e);
             return Result.fail("查看题目详情失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 编辑题目
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/info/updateSubjectInfo")
+    public Result<Boolean> updateSubject(@RequestBody SubjectInfoDTO subjectInfoDTO) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.updateSubjectInfo: {}", JSON.toJSONString(subjectInfoDTO));
+            }
+            Boolean result = subjectService.updateSubjectInfo(subjectInfoDTO);
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("编辑题目失败: {}", e.getMessage(), e);
+            return Result.fail("编辑题目失败:" + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 删除题目
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/info/deleteSubjectInfo")
+    public Result<Boolean> deleteSubject(@RequestBody SubjectInfoDTO subjectInfoDTO) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.deleteSubjectInfo: {}", JSON.toJSONString(subjectInfoDTO));
+            }
+            Boolean result = subjectService.deleteSubject(subjectInfoDTO);
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("删除题目失败: {}", e.getMessage(), e);
+            return Result.fail("删除题目失败:" + e.getMessage());
         }
     }
 

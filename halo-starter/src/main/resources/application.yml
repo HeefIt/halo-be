@@ -39,7 +39,7 @@ spring:
   # Redis配置
   data:
     redis:
-      database: 15
+      database: 0
       host: 192.168.171.100
       port: 6379
       password: "12321"

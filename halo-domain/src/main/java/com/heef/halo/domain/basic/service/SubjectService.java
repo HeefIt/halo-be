@@ -135,6 +135,19 @@ public interface SubjectService {
      */
     SubjectInfoDTO selectSubjectInfo(SubjectInfoDTO subjectInfoDTO);
 
+    /**
+     * 编辑题目
+     * @param subjectInfoDTO
+     * @return
+     */
+    Boolean updateSubjectInfo(SubjectInfoDTO subjectInfoDTO);
+
+    /**
+     * 删除题目
+     * @param subjectInfoDTO
+     * @return
+     */
+    Boolean deleteSubject(SubjectInfoDTO subjectInfoDTO);
 
     /**
      * 保存刷题记录
