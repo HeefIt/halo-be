@@ -1,6 +1,8 @@
 package com.heef.halo.domain.basic.service;
 
 import com.heef.halo.domain.basic.dto.staticDTO.DailyStatisticsDTO;
+import com.heef.halo.domain.basic.dto.staticDTO.RankDTO;
+import com.heef.halo.domain.basic.dto.staticDTO.RankDetailDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectCategoryDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectInfoDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.SubjectLabelDTO;
@@ -196,4 +198,23 @@ public interface SubjectService {
      * @return 尝试的题目数量
      */
     int getAttemptedProblemsCount(Long userId);
+    
+    /**
+     * 获取排行榜数据列表
+     * 
+     * @param timeRange 时间范围 (today, week, month)
+     * @param rankingType 排行类型 (problemCount, score, correctCount)
+     * @return 排行榜数据列表
+     */
+    List<RankDTO> getRankList(String timeRange, String rankingType);
+    
+    /**
+     * 获取排行榜详情
+     * 
+     * @param timeRange 时间范围 (today, week, month)
+     * @param rankingType 排行类型 (problemCount, score, correctCount)
+     * @param userId 当前用户ID
+     * @return 排行榜详情数据
+     */
+    RankDetailDTO getRankDetail(String timeRange, String rankingType, Long userId);
 }

@@ -3,6 +3,8 @@ package com.heef.halo.domain.basic.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.google.common.base.Preconditions;
 import com.heef.halo.domain.basic.dto.staticDTO.DailyStatisticsDTO;
+import com.heef.halo.domain.basic.dto.staticDTO.RankDTO;
+import com.heef.halo.domain.basic.dto.staticDTO.RankDetailDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.*;
 import com.heef.halo.domain.basic.entity.*;
 import com.heef.halo.domain.basic.handler.subject.SubjectTypeHandler;
@@ -17,11 +19,14 @@ import com.heef.halo.enums.IsDeleteFlagEnum;
 import com.heef.halo.result.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -78,6 +83,17 @@ public class SubjectServiceImpl implements SubjectService {
     @Autowired
     private SubjectRecordConvert subjectRecordConvert;
 
+    @Autowired
+    private AuthUserMapper authUserMapper;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    
+    // 排行榜在Redis中的key前缀
+    private static final String RANKING_PREFIX = "ranking:";
+    
+    // 排行榜过期时间（秒）
+    private static final long RANKING_EXPIRE_TIME = 60 * 60; // 1小时
 
     /**
      * 新增题目分类
@@ -809,5 +825,198 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public int getAttemptedProblemsCount(Long userId) {
         return subjectRecordMapper.countAttemptedProblems(userId);
+    }
+    
+    /**
+     * 获取排行榜数据列表
+     * 
+     * @param timeRange 时间范围 (today, week, month)
+     * @param rankingType 排行类型 (problemCount, score, correctCount)
+     * @return 排行榜数据列表
+     */
+    @Override
+    public List<RankDTO> getRankList(String timeRange, String rankingType) {
+        // 构造Redis key
+        String key = RANKING_PREFIX + timeRange + ":" + rankingType;
+        
+        // 从Redis获取排行榜数据
+        ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
+        Set<ZSetOperations.TypedTuple<Object>> tuples = zSetOps.reverseRangeWithScores(key, 0, 99); // 获取前100名
+        
+        List<RankDTO> rankList = new ArrayList<>();
+        if (tuples != null && !tuples.isEmpty()) {
+            int rank = 1;
+            for (ZSetOperations.TypedTuple<Object> tuple : tuples) {
+                RankDTO rankDTO = (RankDTO) tuple.getValue();
+                rankDTO.setValue(tuple.getScore().intValue());
+                
+                // 设置趋势（简化处理，实际项目中可以根据历史数据计算）
+                rankDTO.setTrend("--");
+                
+                rankList.add(rankDTO);
+                rank++;
+            }
+        } else {
+            // 如果Redis中没有数据，则从数据库查询并缓存到Redis
+            rankList = calculateAndCacheRanking(timeRange, rankingType);
+        }
+        
+        return rankList;
+    }
+    
+    /**
+     * 获取排行榜详情
+     * 
+     * @param timeRange 时间范围 (today, week, month)
+     * @param rankingType 排行类型 (problemCount, score, correctCount)
+     * @param userId 当前用户ID
+     * @return 排行榜详情数据
+     */
+    @Override
+    public RankDetailDTO getRankDetail(String timeRange, String rankingType, Long userId) {
+        // 获取排行榜列表
+        List<RankDTO> rankings = getRankList(timeRange, rankingType);
+        
+        // 查找当前用户在排行榜中的位置
+        RankDTO currentUserRank = null;
+        int currentUserRanking = 0;
+        for (int i = 0; i < rankings.size(); i++) {
+            RankDTO rankDTO = rankings.get(i);
+            if (rankDTO.getId().equals(userId)) {
+                currentUserRank = rankDTO;
+                currentUserRanking = i + 1; // 排名从1开始
+                break;
+            }
+        }
+        
+        // 构造返回结果
+        RankDetailDTO rankDetailDTO = new RankDetailDTO();
+        rankDetailDTO.setRankings(rankings);
+        if (currentUserRank != null) {
+            rankDetailDTO.setCurrentUserRank(currentUserRanking);
+            rankDetailDTO.setCurrentUserValue(currentUserRank.getValue());
+        } else {
+            // 如果用户不在排行榜中，设置默认值
+            rankDetailDTO.setCurrentUserRank(0);
+            rankDetailDTO.setCurrentUserValue(0);
+        }
+        
+        return rankDetailDTO;
+    }
+    
+    /**
+     * 计算并缓存排行榜数据
+     * 
+     * @param timeRange 时间范围
+     * @param rankingType 排行类型
+     * @return 排行榜数据列表
+     */
+    private List<RankDTO> calculateAndCacheRanking(String timeRange, String rankingType) {
+        List<RankDTO> rankList = new ArrayList<>();
+        
+        // 获取所有用户
+        List<AuthUser> allUsers = authUserMapper.selectList(new AuthUser());
+        
+        // 构造Redis key
+        String key = RANKING_PREFIX + timeRange + ":" + rankingType;
+        
+        // 计算每个用户的排行数据
+        ZSetOperations<String, Object> zSetOps = redisTemplate.opsForZSet();
+        
+        for (AuthUser user : allUsers) {
+            // 计算用户在指定时间范围内的统计数据
+            int value = calculateUserRankValue(user.getId(), timeRange, rankingType);
+            
+            // 创建RankDTO对象
+            RankDTO rankDTO = new RankDTO();
+            rankDTO.setId(user.getId());
+            rankDTO.setUserName(user.getNickName() != null ? user.getNickName() : user.getUserName());
+            rankDTO.setAvatar(user.getAvatar());
+            rankDTO.setTrend("--"); // 简化处理，实际项目中可以根据历史数据计算
+            
+            // 添加到Redis有序集合中
+            zSetOps.add(key, rankDTO, value);
+            
+            // 同时添加到返回列表中
+            rankDTO.setValue(value);
+            rankList.add(rankDTO);
+        }
+        
+        // 设置过期时间
+        redisTemplate.expire(key, RANKING_EXPIRE_TIME, TimeUnit.SECONDS);
+        
+        // 按分数降序排序
+        rankList.sort((r1, r2) -> r2.getValue().compareTo(r1.getValue()));
+        
+        return rankList;
+    }
+    
+    /**
+     * 计算用户在指定时间范围内的排行值
+     * 
+     * @param userId 用户ID
+     * @param timeRange 时间范围
+     * @param rankingType 排行类型
+     * @return 排行值
+     */
+    private int calculateUserRankValue(Long userId, String timeRange, String rankingType) {
+        Date startTime = getStartTime(timeRange);
+        Date endTime = new Date(); // 当前时间
+        
+        // 获取用户在指定时间范围内的答题记录
+        List<SubjectRecord> records = subjectRecordMapper.getDailyRecords(userId, startTime, endTime);
+        
+        switch (rankingType) {
+            case "problemCount": // 刷题数(用户的刷题记录数)
+                return records.size();
+            case "score": // 得分(用户刷题记录的分数值)
+                return records.stream().mapToInt(record -> record.getScore() != null ? record.getScore() : 0).sum();
+            case "correctCount": // 正确数 (用户的回答正确数)
+                return (int) records.stream().filter(record -> record.getIsCorrect() != null && record.getIsCorrect() == 1).count();
+            default:
+                return 0;
+        }
+    }
+    
+    /**
+     * 根据时间范围获取开始时间
+     * 
+     * @param timeRange 时间范围
+     * @return 开始时间
+     */
+    private Date getStartTime(String timeRange) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        
+        switch (timeRange) {
+            case "today": // 今天
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                break;
+            case "week": // 本周
+                calendar.setFirstDayOfWeek(Calendar.MONDAY);
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                break;
+            case "month": // 本月
+                calendar.set(Calendar.DAY_OF_MONTH, 1);
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                break;
+            default:
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+        }
+        
+        return calendar.getTime();
     }
 }

@@ -3,6 +3,8 @@ package com.heef.halo.domain.basic.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
+import com.heef.halo.domain.basic.dto.staticDTO.RankDTO;
+import com.heef.halo.domain.basic.dto.staticDTO.RankDetailDTO;
 import com.heef.halo.domain.basic.dto.subjectDTO.*;
 import com.heef.halo.domain.basic.service.SubjectService;
 import com.heef.halo.result.PageResult;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -447,11 +450,8 @@ public class SubjectController {
     }
     
     /**
-     * 获取用户答题记录
+     * 获取当前用户答题记录
      * (后续可以做排行榜(排行榜类型---总排行榜和今日排行榜)
-     * 1: 用户的回答正确率榜单[根据用用户的答题记录得分],
-     * 2: 题目的热门榜单[题目的被回答次数],
-     * 3: 用户的刷题次数榜单[刷题狂魔])
      *
      * @param userId
      * @return
@@ -473,9 +473,6 @@ public class SubjectController {
     /**
      * 获取题目答题记录
      * (后续可以做排行榜(排行榜类型---总排行榜和今日排行榜)
-     * 1: 用户的回答正确率榜单[根据用用户的答题记录得分],
-     * 2: 题目的热门榜单[题目的被回答次数],
-     * 3: 用户的刷题次数榜单[刷题狂魔])
      * @param subjectId
      * @return
      */
@@ -494,7 +491,7 @@ public class SubjectController {
     }
     
     /**
-     * 获取用户已解决的题目数量
+     * 获取当前用户已解决的题目数量
      * 
      * @param userId 用户ID
      * @return 已解决的题目数量
@@ -514,7 +511,7 @@ public class SubjectController {
     }
     
     /**
-     * 获取用户尝试的题目数量
+     * 获取当前用户尝试的题目数量
      * 
      * @param userId 用户ID
      * @return 尝试的题目数量
@@ -530,6 +527,58 @@ public class SubjectController {
         } catch (Exception e) {
             log.error("获取用户尝试题目数量失败: {}", e.getMessage(), e);
             return Result.fail("获取用户尝试题目数量失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取排行榜数据(获取排行榜列表数据)
+     * 显示排行榜的基本列表信息
+     * timeRange: 时间范围，可选值为 today（今日）、week（本周）、month（本月）
+     * rankingType: 排行类型，可选值为 problemCount（刷题数）、score（得分）、correctCount（正确数）
+     * @param timeRange
+     * @param rankType
+     * @return
+     */
+    @GetMapping("/record/getRankList")
+    public Result<List<RankDTO>> getRankList(
+            @RequestParam String timeRange, 
+            @RequestParam String rankType) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.getRankList: {},{}", timeRange,rankType);
+            }
+            List<RankDTO> rankList = subjectService.getRankList(timeRange, rankType);
+            return Result.ok(rankList);
+        } catch (Exception e) {
+            log.error("获取排行榜数据失败: {}", e.getMessage(), e);
+            return Result.fail("获取排行榜数据失败:" + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 获取排行榜详情
+     * 显示排行榜的详细信息，包括当前用户在排行榜中的具体位置
+     *
+     * @param timeRange 选择获取排行榜的时间范围
+     * @param rankType 排行榜类型
+     * @param userId 用户ID
+     * @return 排行榜详情
+     */
+    @GetMapping("/record/getRankDetail")
+    public Result<RankDetailDTO> getRankDetail(
+            @RequestParam String timeRange, 
+            @RequestParam String rankType,
+            @RequestParam Long userId) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("SubjectController.getRankDetail: timeRange={}, rankType={}, userId={}", timeRange, rankType, userId);
+            }
+            RankDetailDTO rankDetail = subjectService.getRankDetail(timeRange, rankType, userId);
+            return Result.ok(rankDetail);
+        } catch (Exception e) {
+            log.error("获取排行榜详情数据失败: {}", e.getMessage(), e);
+            return Result.fail("获取排行榜详情数据失败:" + e.getMessage());
         }
     }
 }
