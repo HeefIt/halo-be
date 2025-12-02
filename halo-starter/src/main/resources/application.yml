@@ -100,6 +100,25 @@ minio:
   bucket-name: halo
   secure: false
 
+
+## XXL-JOB 配置
+#xxl:
+#  job:
+#    admin:
+#      # 调度中心地址，就是你刚才启动的服务
+#      addresses: http://localhost:8880/xxl-job-admin
+#    # 执行器通讯TOKEN，如果调度中心配置了就需要填写，默认为空
+#    accessToken: "default_token"
+#    executor:
+#      # 执行器AppName，在调度中心创建执行器时要对应
+#      appname: halo
+#      # 执行器端口号，运行执行器的服务器端口（取消注释）
+#      port: 9999
+#      # 执行器日志路径
+#      logpath: ./logs/xxl-job/jobhandler
+#      # 执行器日志保存天数
+#      logretentiondays: 30
+
 # Nacos配置（已注释）
 #spring:
 #  cloud:

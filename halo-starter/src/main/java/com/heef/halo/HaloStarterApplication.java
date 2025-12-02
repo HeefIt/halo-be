@@ -17,7 +17,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @ComponentScan("com.heef.halo")  // 确保扫描到所有组件
 @EnableCaching
-@EnableScheduling  //开启定时
+@EnableScheduling  //开启定时 @Scheduled
 @Slf4j
 @MapperScan("com.heef.halo.domain.basic.mapper")
 public class HaloStarterApplication {
