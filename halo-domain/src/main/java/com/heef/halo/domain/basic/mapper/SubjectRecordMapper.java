@@ -2,86 +2,36 @@ package com.heef.halo.domain.basic.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.heef.halo.domain.basic.entity.SubjectRecord;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
 
 /**
- * (SubjectRecord)表数据库访问层
+ * 刷题记录Mapper接口
  *
- * @author heef
- * @since 2025-11-20 11:32:33
+ * @author heefM
+ * @date 2025-11-05
  */
-@Mapper
 public interface SubjectRecordMapper extends BaseMapper<SubjectRecord> {
 
     /**
-     * 通过ID查询单条数据
+     * 分页查询
      *
-     * @param id 主键
-     * @return 实例对象
+     * @param offset 偏移量
+     * @param pageSize 每页数量
+     * @param subjectRecord 查询条件
+     * @return 刷题记录列表
      */
-    SubjectRecord selectById(Long id);
+    List<SubjectRecord> selectPage(@Param("offset") int offset, @Param("pageSize") int pageSize, @Param("subjectRecord") SubjectRecord subjectRecord);
 
     /**
-     * 查询指定行数据
+     * 统计总数
      *
      * @param subjectRecord 查询条件
-     * @param offset        offset
-     * @param pageSize      pageSize
-     * @return 对象列表
+     * @return 总数
      */
-    List<SubjectRecord> selectPage(@Param("subjectRecord") SubjectRecord subjectRecord, @Param("offset") int offset, @Param("pageSize") int pageSize);
-
-    /**
-     * 统计总行数
-     *
-     * @param subjectRecord 查询条件
-     * @return 总行数
-     */
-    long count(SubjectRecord subjectRecord);
-
-    /**
-     * 新增数据
-     *
-     * @param subjectRecord 实例对象
-     * @return 影响行数
-     */
-    int insert(SubjectRecord subjectRecord);
-
-    /**
-     * 批量新增数据（MyBatis原生foreach方法）
-     *
-     * @param entities List<SubjectRecord> 实例对象列表
-     * @return 影响行数
-     */
-    int insertBatch(@Param("entities") List<SubjectRecord> entities);
-
-    /**
-     * 批量新增或按主键更新数据（MyBatis原生foreach方法）
-     *
-     * @param entities List<SubjectRecord> 实例对象列表
-     * @return 影响行数
-     */
-    int insertOrUpdateBatch(@Param("entities") List<SubjectRecord> entities);
-
-    /**
-     * 修改数据
-     *
-     * @param subjectRecord 实例对象
-     * @return 影响行数
-     */
-    int update(SubjectRecord subjectRecord);
-
-    /**
-     * 通过主键删除数据
-     *
-     * @param id 主键
-     * @return 影响行数
-     */
-    int deleteById(Long id);
+    long count(@Param("subjectRecord") SubjectRecord subjectRecord);
 
     /**
      * 根据用户ID获取答题记录
@@ -108,6 +58,16 @@ public interface SubjectRecordMapper extends BaseMapper<SubjectRecord> {
      * @return 答题记录列表
      */
     List<SubjectRecord> getDailyRecords(@Param("userId") Long userId, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+    
+    /**
+     * 获取用户在指定时间范围内的刷题记录（用于排行榜）
+     * 
+     * @param userId 用户ID
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 答题记录列表
+     */
+    List<SubjectRecord> getRankRecords(@Param("userId") Long userId, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
     
     /**
      * 统计用户已解决的题目数量（回答正确的题目）

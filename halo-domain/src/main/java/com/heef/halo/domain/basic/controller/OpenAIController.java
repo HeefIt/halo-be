@@ -13,6 +13,12 @@ import reactor.core.publisher.Flux;
 
 import java.util.Map;
 
+/**
+ * ai大模型调用controller
+ *
+ * @author heefM
+ * @date 2025-12-04
+ */
 @RestController
 @RequestMapping("/api/openAI")
 @Slf4j

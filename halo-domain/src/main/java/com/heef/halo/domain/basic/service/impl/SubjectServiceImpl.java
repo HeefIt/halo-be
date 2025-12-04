@@ -93,7 +93,7 @@ public class SubjectServiceImpl implements SubjectService {
     private static final String RANKING_PREFIX = "ranking:";
     
     // 排行榜过期时间（秒）
-    private static final long RANKING_EXPIRE_TIME = 60 * 60; // 1小时
+    private static final long RANKING_EXPIRE_TIME = 2 * 60; // 2分钟
 
     /**
      * 新增题目分类
@@ -960,11 +960,18 @@ public class SubjectServiceImpl implements SubjectService {
      * @return 排行值
      */
     private int calculateUserRankValue(Long userId, String timeRange, String rankingType) {
+        //根据时间范围表示来计算获取是每天凌晨00:00还是每周一凌晨00:00还是每月1号00:00
         Date startTime = getStartTime(timeRange);
         Date endTime = new Date(); // 当前时间
         
-        // 获取用户在指定时间范围内的答题记录
-        List<SubjectRecord> records = subjectRecordMapper.getDailyRecords(userId, startTime, endTime);
+        // 添加日志输出，明确显示参数值
+        if (log.isDebugEnabled()) {
+            log.debug("查询用户排行榜数据: userId={}, timeRange={}, rankingType={}, startTime={}, endTime={}", 
+                      userId, timeRange, rankingType, startTime, endTime);
+        }
+        
+        // 获取用户在指定时间范围内的答题记录(使用新的排行榜专用方法)
+        List<SubjectRecord> records = subjectRecordMapper.getRankRecords(userId, startTime, endTime);
         
         switch (rankingType) {
             case "problemCount": // 刷题数(用户的刷题记录数)

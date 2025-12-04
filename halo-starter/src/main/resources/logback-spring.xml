@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-    <!-- 定义日志文件的存储地址 -->
-    <property name="LOG_HOME" value="../log" />
+    <!-- 定义日志文件的存储地址 halo-log是日志文件夹-->
+    <property name="LOG_HOME" value="../halo-log" />
     
     <!-- 定义彩色输出格式 -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
@@ -29,9 +29,9 @@
         <file>${LOG_HOME}/halo.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 按日期和文件大小双重策略滚动 -->
-            <fileNamePattern>${LOG_HOME}/halo.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
-            <maxFileSize>100MB</maxFileSize>
+            <fileNamePattern>${LOG_HOME}/halo.%d{yyyy-MM-dd}.%i.log</fileNamePattern><!--日志文件名称-->
+            <maxHistory>30</maxHistory> <!--日志保留时间30天-->
+            <maxFileSize>100MB</maxFileSize><!--单个日志最大容量100mb-->
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!-- 生产级日志格式：清晰、结构化 -->

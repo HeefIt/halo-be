@@ -180,6 +180,17 @@
         ORDER BY answer_time DESC
     </select>
     
+    <!-- 获取用户在指定时间范围内的刷题记录（用于排行榜） -->
+    <select id="getRankRecords" resultMap="SubjectRecordMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM subject_record
+        WHERE user_id = #{userId}
+        AND answer_time >= #{startTime}
+        AND answer_time &lt;= #{endTime}
+        ORDER BY answer_time DESC
+    </select>
+    
     <!-- 统计用户已解决的题目数量（回答正确的题目） -->
     <select id="countSolvedProblems" resultType="int">
         SELECT COUNT(DISTINCT subject_id)
