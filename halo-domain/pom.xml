@@ -102,6 +102,12 @@
             <version>8.5.7</version>
         </dependency>
 
+        <!--xxl-job-->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
+
 <!--        &lt;!&ndash; DeepSeek &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.ai</groupId>-->
@@ -125,12 +131,11 @@
             <artifactId>spring-ai-starter-model-openai</artifactId>
         </dependency>
 
-        <!--xxl-job-->
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-        </dependency>
-
+<!--        &lt;!&ndash;chorma 开源的向量数据库依赖 版本由ai-bom自动管理&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.ai</groupId>-->
+<!--            <artifactId>spring-ai-starter-vector-store-chroma</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 

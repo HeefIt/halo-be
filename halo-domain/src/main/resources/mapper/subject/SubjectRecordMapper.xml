@@ -72,35 +72,35 @@
         select count(*)
         from subject_record
         <where>
-            <if test="id != null">
-                and id = #{id}
+            <if test="subjectRecord.id != null">
+                and id = #{subjectRecord.id}
             </if>
-            <if test="userId != null">
-                and user_id = #{userId}
+            <if test="subjectRecord.userId != null">
+                and user_id = #{subjectRecord.userId}
             </if>
-            <if test="subjectId != null">
-                and subject_id = #{subjectId}
+            <if test="subjectRecord.subjectId != null">
+                and subject_id = #{subjectRecord.subjectId}
             </if>
-            <if test="userAnswer != null and userAnswer != ''">
-                and user_answer = #{userAnswer}
+            <if test="subjectRecord.userAnswer != null and subjectRecord.userAnswer != ''">
+                and user_answer = #{subjectRecord.userAnswer}
             </if>
-            <if test="isCorrect != null">
-                and is_correct = #{isCorrect}
+            <if test="subjectRecord.isCorrect != null">
+                and is_correct = #{subjectRecord.isCorrect}
             </if>
-            <if test="answerTime != null">
-                and answer_time = #{answerTime}
+            <if test="subjectRecord.answerTime != null">
+                and answer_time = #{subjectRecord.answerTime}
             </if>
-            <if test="timeCost != null">
-                and time_cost = #{timeCost}
+            <if test="subjectRecord.timeCost != null">
+                and time_cost = #{subjectRecord.timeCost}
             </if>
-            <if test="score != null">
-                and score = #{score}
+            <if test="subjectRecord.score != null">
+                and score = #{subjectRecord.score}
             </if>
-            <if test="createTime != null">
-                and create_time = #{createTime}
+            <if test="subjectRecord.createTime != null">
+                and create_time = #{subjectRecord.createTime}
             </if>
-            <if test="updateTime != null">
-                and update_time = #{updateTime}
+            <if test="subjectRecord.updateTime != null">
+                and update_time = #{subjectRecord.updateTime}
             </if>
         </where>
     </select>

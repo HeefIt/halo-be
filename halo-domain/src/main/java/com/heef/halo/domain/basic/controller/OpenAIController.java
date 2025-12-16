@@ -2,15 +2,18 @@ package com.heef.halo.domain.basic.controller;
 
 import com.heef.halo.domain.basic.dto.openAIDTO.RequestChatDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.document.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +30,10 @@ public class OpenAIController {
 
     @Autowired
     private ChatModel chatModel;
+//    @Autowired
+//    private VectorStore chromaVectorStore;
+
+
 
     /**
      * 测试DeepSeek模型
@@ -86,7 +93,6 @@ public class OpenAIController {
             "question", requestChatDTO.getMessage()
         );
     }
-
     /**
      * DeepSeek流式响应
      */
@@ -95,5 +101,38 @@ public class OpenAIController {
         return chatModel.stream(new Prompt(new UserMessage(message)))
                 .map(chatResponse -> chatResponse.getResult().getOutput().getText());
     }
+    
+//    /**
+//     * 测试Chroma向量数据库连接
+//     */
+//    @PostMapping("/chroma/test")
+//    public Map<String, Object> testChromaConnection(@RequestBody RequestChatDTO requestChatDTO) {
+//        try {
+//            // 创建测试文档
+//            Document document = new Document(requestChatDTO.getMessage());
+//
+//            // 将文档存入Chroma向量数据库
+//            chromaVectorStore.add(List.of(document));
+//
+//            // 从数据库中检索相似文档
+//            List<Document> results = chromaVectorStore.similaritySearch(requestChatDTO.getMessage());
+//
+//            log.info("Chroma向量数据库测试成功，检索到 {} 条相似文档", results.size());
+//
+//            return Map.of(
+//                "success", true,
+//                "message", "Chroma向量数据库连接测试成功",
+//                "documentCount", results.size(),
+//                "documents", results.stream().map(Document::getText).toList()
+//            );
+//        } catch (Exception e) {
+//            log.error("Chroma向量数据库测试失败", e);
+//            return Map.of(
+//                "success", false,
+//                "message", "Chroma向量数据库连接测试失败: " + e.getMessage()
+//            );
+//        }
+//    }
+
 
 }

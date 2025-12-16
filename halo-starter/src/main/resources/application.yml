@@ -67,16 +67,40 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
 
+
+################################################################################################
   # Spring AI 配置 - DeepSeek
+            #base-url: https://api.deepseek.com     #推荐使用deepseek自带重定向（更简洁）
+            #base-url: https://api.deepseek.com/v1  #完全兼容 OpenAI 格式
+            #model: deepseek-chat  # 非思考模式
+            #model: deepseek-reasoner  # 思考模式
   ai:
     openai:
       api-key: sk-cedfd52d67784675b6266b2b97a0f4cc
-      base-url: https://api.deepseek.com
+      base-url: https://api.deepseek.com/v1
       chat:
         options:
-          model: deepseek-chat
+          model: deepseek-chat  # 非思考模式
           temperature: 0.7
           max-tokens: 2048
+#      embedding: #向量嵌入模型配置
+#        enabled: ture
+#        options:
+#          model: text-embedding-ada-002
+
+
+#    # Chroma Cloud 配置
+#    vectorstore:
+#      chroma:
+#        client:
+#          host: https://www.trychroma.com/hhm3406698893  # 注意：是 host  ||Chroma Cloud 的 API 端点
+#          port: 443
+#          key-token: ck-HVNFMTM2EBxJtfU92zdQbhC7pchcrDFwaDZoaTEfuUSv  # 认证方式：直接用 key-token#        api-key: ck-HVNFMTM2EBxJtfU92zdQbhC7pchcrDFwaDZoaTEfuUSv
+#                                                                                               #        tenant-id: 7dc0aa33-32f9-4531-a3b2-ff452bd40245
+#        collection-name: halo-documents
+#        initialize-schema: true
+
+##########################################################################################
 
 # Sa-Token 配置
 sa-token:
