@@ -1,0 +1,139 @@
+# 服务配置
+server:
+  port: 2004
+
+spring:
+  # 数据源配置
+  datasource:
+    username: halo
+    password: "halo123"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://115.190.184.31:3306/halo?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 20
+      min-idle: 20
+      max-active: 100
+      max-wait: 60000
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: admin
+        login-password: "123456"
+      filter:
+        stat:
+          enabled: true
+          slow-sql-millis: 2000
+          log-slow-sql: true
+        wall:
+          enabled: true
+        config:
+          enabled: true
+
+  # Redis配置
+  data:
+    redis:
+      database: 0
+      host: 115.190.184.31
+      port: 6379
+      password: "redis123"
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 0
+
+  # Spring AI 配置 - DeepSeek
+  ai:
+    openai:
+      api-key: sk-0faae1bf427546d9ad2f9503c98f48f4
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat  # 非思考模式
+          temperature: 0.7
+          max-tokens: 2048
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Jackson 配置 - 日期格式化
+jackson:
+  date-format: yyyy-MM-dd HH:mm:ss
+  time-zone: GMT+8
+
+##########################################################################################
+
+# Sa-Token 配置
+sa-token:
+  token-name: satoken
+  timeout: 2592000
+  active-timeout: -1
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: true
+
+# 日志配置
+logging:
+  config: classpath:logback-spring.xml
+
+# MinIO配置
+minio:
+  endpoint: http://115.190.184.31:9000
+  access-key: minioadmin
+  secret-key: minio123
+  bucket-name: halo-bucket
+  secure: false
+
+
+## XXL-JOB 配置
+#xxl:
+#  job:
+#    admin:
+#      # 调度中心地址，就是你刚才启动的服务
+#      addresses: http://115.190.184.31:8880/xxl-job-admin
+#    # 执行器通讯TOKEN，如果调度中心配置了就需要填写，默认为空
+#    accessToken: "default_token"
+#    executor:
+#      # 执行器AppName，在调度中心创建执行器时要对应
+#      appname: halo
+#      # 执行器端口号，运行执行器的服务器端口（取消注释）
+#      port: 9999
+#      # 执行器日志路径
+#      logpath: ./logs/xxl-job/jobhandler
+#      # 执行器日志保存天数
+#      logretentiondays: 30
+
+# Nacos配置（已注释）
+#spring:
+#  cloud:
+#    nacos:
+#      config:
+#        server-addr: 115.190.184.31:8848
+#        prefix: ${spring.application.name}
+#        group: DEFAULT_GROUP
+#        namespace:
+#        file-extension: yaml
+#      discovery:
+#        enabled: true
+#        server-addr: localhost:8848
+
+# RocketMQ配置（已注释）
+#rocketmq:
+#  name-server: 115.190.184.31:9876
+#  producer:
+#    group: canal-cache-consumer-group
+#    send-message-timeout: 3000
+#    retry-times: 3
+#    max-message-size: 1048576
