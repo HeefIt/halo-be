@@ -1,11 +1,14 @@
 package com.heef.halo.domain.AOpenAiPractice.openAiController;
 
+import com.alibaba.fastjson.JSON;
+import com.heef.halo.domain.AOpenAiPractice.openAiConfig.PromptConfig;
 import com.heef.halo.domain.AOpenAiPractice.openAiDto.*;
 import com.heef.halo.domain.AOpenAiPractice.openAiService.impl.AiSessionServiceImpl;
 import com.heef.halo.result.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -17,6 +20,7 @@ import java.util.Date;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +33,9 @@ public class OpenAiChatController {
     
     @Autowired
     private AiSessionServiceImpl aiSessionService;
+
+    @Autowired
+    private PromptConfig promptConfig;
 
 
     /**
@@ -52,42 +59,52 @@ public class OpenAiChatController {
      * @return AI回复结果
      */
     @PostMapping("/chat")
-    public Result<ChatResponseDTO> chat(@RequestBody ChatRequestDTO request, 
-                                       @RequestHeader(value = "userId", required = false) Long userId) {
+    public Result<ChatResponseDTO> chat(@RequestBody ChatRequestDTO request,
+                                        @RequestHeader(value = "userId", required = false) Long userId) {
         try {
             log.info("收到AI聊天请求，消息数量: {}, userId: {}", request.getMessages().size(), userId);
 
-            // 如果没有用户ID，使用默认ID
+            // 1. 处理用户ID
             if (userId == null) {
                 userId = 0L;
             }
 
-            // 构建消息列表
-            List<Message> messages = new ArrayList<>();
-
-            // 添加系统提示词
-            messages.add(new SystemMessage("你是一个智能AI助手，能够回答各种问题，提供有用的建议和帮助。"));
-
-            // 添加历史消息
-            for (ChatMessageDTO messageDTO : request.getMessages()) {
-                if ("user".equalsIgnoreCase(messageDTO.getRole())) {
-                    messages.add(new UserMessage(messageDTO.getContent()));
-                } else if ("assistant".equalsIgnoreCase(messageDTO.getRole())) {
-                    messages.add(new org.springframework.ai.chat.messages.AssistantMessage(messageDTO.getContent()));
-                }
+            // 2. 处理会话ID（Advisor需要这个ID来管理记忆）
+            String sessionId = request.getSessionID();
+            if (sessionId == null || sessionId.isEmpty()) {
+                sessionId = userId + "_" + UUID.randomUUID().toString();  // 生成唯一会话ID
+                log.info("生成新会话ID: {}", sessionId);
             }
 
-            // 调用AI获取回复
+            // 3. 获取最后一条用户消息（只传当前问题）
+            String userMessage = request.getMessages().stream()
+                    .filter(m -> "user".equalsIgnoreCase(m.getRole()))
+                    .map(ChatMessageDTO::getContent)
+                    .reduce((first, second) -> second)  // 取最后一条
+                    .orElse("");
+
+            log.info("当前用户消息: {}, 会话ID: {}", userMessage, sessionId);
+
+            final String finalSessionId = sessionId;  // 创建final副本(在Lambda表达式中使用的变量必须是final不可变的)
+
+            // 4. 调用AI - Advisor会自动管理历史消息
             String reply = chatClient.prompt()
-                    .messages(messages)
+                    .user(userMessage)  // 只传当前消息！
+                    .advisors(advisor -> advisor
+                            .param("chat_memory_conversation_id", finalSessionId)  // 告诉Advisor会话ID
+                    )
                     .call()
                     .content();
 
-            log.info("AI回复成功");
+            log.info("AI回复成功: {}", reply);
 
-            // 构建响应
+//            // 5. 可选：同步数据到您的内存Map（如果需要持久化）
+//            syncToYourMemory(sessionId, userId, userMessage, reply);
+
+            // 6. 构建响应
             ChatResponseDTO responseDTO = ChatResponseDTO.builder()
                     .reply(reply)
+                    .sessionId(sessionId)
                     .build();
 
             return Result.ok(responseDTO);
@@ -97,6 +114,157 @@ public class OpenAiChatController {
             return Result.fail("AI服务异常: " + e.getMessage());
         }
     }
+
+    /**
+     * AI对话接口 - 流式输出版本，支持会话记忆
+     * 
+     * @param request 聊天请求，包含消息历史
+     * @return 流式AI回复结果
+     */
+    @PostMapping(value = "/chat/stream", produces = "text/event-stream")
+    public Flux<ChatResponseDTO> chatStream(@RequestBody ChatRequestDTO request,
+                                           @RequestHeader(value = "userId", required = false) Long userId) {
+        try {
+            log.info("收到AI流式聊天请求，消息数量: {}, userId: {}", request.getMessages().size(), userId);
+
+            // 1. 处理用户ID
+            if (userId == null) {
+                userId = 0L;
+            }
+
+            // 2. 处理会话ID（Advisor需要这个ID来管理记忆）
+            String sessionId = request.getSessionID();
+            if (sessionId == null || sessionId.isEmpty()) {
+                sessionId = userId + "_" + UUID.randomUUID().toString();  // 生成唯一会话ID
+                log.info("生成新会话ID: {}", sessionId);
+            }
+
+            // 3. 获取最后一条用户消息（只传当前问题）
+            String userMessage = request.getMessages().stream()
+                    .filter(m -> "user".equalsIgnoreCase(m.getRole()))
+                    .map(ChatMessageDTO::getContent)
+                    .reduce((first, second) -> second)  // 取最后一条
+                    .orElse("");
+
+            log.info("当前用户消息: {}, 会话ID: {}", userMessage, sessionId);
+
+            final String finalSessionId = sessionId;  // 创建final副本(在Lambda表达式中使用的变量必须是final不可变的)
+
+            // 4. 调用AI流式输出
+            return chatClient.prompt()
+                    .user(userMessage)  // 只传当前消息！
+                    .advisors(advisor -> advisor
+                            .param("chat_memory_conversation_id", finalSessionId)  // 告诉Advisor会话ID
+                    )
+                    .stream()
+                    .content()
+                    .map(content -> ChatResponseDTO.builder()
+                            .reply(content)
+                            .sessionId(finalSessionId)
+                            .build());
+
+        } catch (Exception e) {
+            log.error("AI流式对话失败", e);
+            return Flux.error(new RuntimeException("AI服务异常: " + e.getMessage()));
+        }
+    }
+
+
+//    /**
+//     * 阻塞式--AI对话接口 - 手动管理历史对话信息--在clientConfig中可以删除advisor中的MessageChatMemoryAdvisor
+//     * @param request
+//     * @param userId
+//     * @return
+//     */
+//    @PostMapping("/chat")
+//    public Result<ChatResponseDTO> chat(@RequestBody ChatRequestDTO request,
+//                                        @RequestHeader(value = "userId", required = false) Long userId) {
+//        try {
+//            log.info("收到AI聊天请求，消息数量: {}, userId: {}", request.getMessages().size(), userId);
+//
+//            // 1. 处理用户ID
+//            if (userId == null) {
+//                userId = 0L;
+//            }
+//
+//            // 2. 处理会话ID
+//            String sessionId = request.getSessionID();
+//            if (sessionId == null || sessionId.isEmpty()) {
+//                // 创建新会话
+//                SessionDTO newSession = aiSessionService.createSession(userId, "新对话");
+//                sessionId = newSession.getSessionId();
+//                log.info("创建新会话: {}", sessionId);
+//            }
+//
+//            // 3. 从内存获取历史消息
+//            List<ChatMessageDTO> historyMessages = aiSessionService.getSessionMessages(sessionId, userId);
+//            log.info("历史消息数量: {}", historyMessages.size());
+//
+//            // 4. 构建消息列表（历史 + 当前）
+//            List<Message> messages = new ArrayList<>();
+//
+//            // 4.1 添加历史消息
+//            for (ChatMessageDTO msg : historyMessages) {
+//                if ("user".equalsIgnoreCase(msg.getRole())) {
+//                    messages.add(new UserMessage(msg.getContent()));
+//                } else if ("assistant".equalsIgnoreCase(msg.getRole())) {
+//                    messages.add(new AssistantMessage(msg.getContent()));
+//                }
+//            }
+//
+//            // 4.2 添加当前用户消息
+//            String currentUserMessage = null;
+//            for (ChatMessageDTO msg : request.getMessages()) {
+//                if ("user".equalsIgnoreCase(msg.getRole())) {
+//                    messages.add(new UserMessage(msg.getContent()));
+//                    currentUserMessage = msg.getContent();
+//                }
+//            }
+//
+//            log.info("最终发送给AI的消息总数: {}", messages.size());
+//
+//            // 5. 调用AI
+//            String reply = chatClient.prompt()
+//                    .messages(messages)
+//                    .call()
+//                    .content();
+//
+//            log.info("AI回复成功: {}", reply);
+//
+//            // 6. 保存对话到内存
+//            // 6.1 保存用户消息
+//            if (currentUserMessage != null) {
+//                ChatMessageDTO userMsg = new ChatMessageDTO();
+//                userMsg.setRole("user");
+//                userMsg.setContent(currentUserMessage);
+//                userMsg.setTimestamp(String.valueOf(System.currentTimeMillis()));
+//                aiSessionService.addMessageToSession(sessionId, userId, userMsg);
+//            }
+//
+//            // 6.2 保存AI回复
+//            ChatMessageDTO assistantMsg = new ChatMessageDTO();
+//            assistantMsg.setRole("assistant");
+//            assistantMsg.setContent(reply);
+//            assistantMsg.setTimestamp(String.valueOf(System.currentTimeMillis()));
+//            aiSessionService.addMessageToSession(sessionId, userId, assistantMsg);
+//
+//            log.info("对话已保存到内存，会话ID: {}", sessionId);
+//
+//            // 7. 构建响应
+//            ChatResponseDTO responseDTO = ChatResponseDTO.builder()
+//                    .reply(reply)
+//                    .sessionId(sessionId)
+//                    .build();
+//
+//            return Result.ok(responseDTO);
+//
+//        } catch (Exception e) {
+//            log.error("AI对话失败", e);
+//            return Result.fail("AI服务异常: " + e.getMessage());
+//        }
+//    }
+
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
@@ -247,5 +415,40 @@ public class OpenAiChatController {
             return Result.fail("更新会话失败: " + e.getMessage());
         }
     }
+
+
+    /**
+     * 持久化--对话消息
+     */
+    private void syncToYourMemory(String sessionId, Long userId, String userMessage, String assistantMessage) {
+        try {
+            // 检查会话是否已存在
+            SessionDTO session = aiSessionService.getSessionById(sessionId, userId);
+            if (session == null) {
+                // 创建新会话
+                session = aiSessionService.createSession(userId, "新对话");
+                // 注意：这里sessionId可能不同，需要处理
+            }
+
+            // 保存用户消息
+            ChatMessageDTO userMsg = new ChatMessageDTO();
+            userMsg.setRole("user");
+            userMsg.setContent(userMessage);
+            userMsg.setTimestamp(String.valueOf(System.currentTimeMillis()));
+            aiSessionService.addMessageToSession(sessionId, userId, userMsg);
+
+            // 保存AI回复
+            ChatMessageDTO assistantMsg = new ChatMessageDTO();
+            assistantMsg.setRole("assistant");
+            assistantMsg.setContent(assistantMessage);
+            assistantMsg.setTimestamp(String.valueOf(System.currentTimeMillis()));
+            aiSessionService.addMessageToSession(sessionId, userId, assistantMsg);
+
+            log.info("同步到内存Map成功: {}", sessionId);
+        } catch (Exception e) {
+            log.error("同步到内存Map失败", e);
+        }
+    }
+
 
 }

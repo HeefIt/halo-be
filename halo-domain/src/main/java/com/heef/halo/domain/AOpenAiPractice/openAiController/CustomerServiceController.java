@@ -5,6 +5,7 @@ import com.heef.halo.result.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -29,7 +30,7 @@ import java.util.List;
 @RestController
 public class CustomerServiceController {
 
-    private final ChatClient chatClient;
+    private final ChatClient customerChatClient;
 
     /**
      * 智能客服问答
@@ -40,26 +41,21 @@ public class CustomerServiceController {
     @PostMapping("/chat")
     public Result<ChatResponseDTO> customerService(@RequestBody ChatRequestDTO request) {
         try {
-            log.info("收到智能客服请求");
+            log.info("智能客服收到请求");
 
-            String systemPrompt = """
-                你是一个专业的智能客服助手，7x24小时在线服务用户。
-                你需要快速、准确、友好地解答用户关于平台使用、刷题、学习计划等方面的问题。
-                如果问题涉及具体操作，请给出详细的步骤说明。
-                如果无法解答，请礼貌地引导用户联系人工客服。
-                保持友好、专业的语气。
-                """;
-
+            //消息队列
             List<Message> messages = new ArrayList<>();
-            messages.add(new SystemMessage(systemPrompt));
 
             for (ChatMessageDTO messageDTO : request.getMessages()) {
                 if ("user".equalsIgnoreCase(messageDTO.getRole())) {
                     messages.add(new UserMessage(messageDTO.getContent()));
+                }else if ("assistant".equalsIgnoreCase(messageDTO.getRole())) {
+                    messages.add(new AssistantMessage(messageDTO.getContent()));
                 }
+
             }
 
-            String reply = chatClient.prompt()
+            String reply = customerChatClient.prompt()
                     .messages(messages)
                     .call()
                     .content();
@@ -76,52 +72,52 @@ public class CustomerServiceController {
         }
     }
 
-    /**
-     * 常见问题查询
-     *
-     * @param request 用户查询
-     * @return 常见问题答案
-     */
-    @PostMapping("/faq")
-    public Result<ChatResponseDTO> getFAQ(@RequestBody ChatRequestDTO request) {
-        try {
-            log.info("收到常见问题查询请求");
-
-            String systemPrompt = """
-                你是一个FAQ（常见问题）助手，专门回答用户关于Halo刷题网的常见问题。
-                重点关注以下方面：
-                1. 账号注册与登录
-                2. 题库使用方法
-                3. 学习计划创建
-                4. 排行榜规则
-                5. 练习记录查询
-                请给出简洁明了的答案。
-                """;
-
-            List<Message> messages = new ArrayList<>();
-            messages.add(new SystemMessage(systemPrompt));
-
-            for (ChatMessageDTO messageDTO : request.getMessages()) {
-                if ("user".equalsIgnoreCase(messageDTO.getRole())) {
-                    messages.add(new UserMessage(messageDTO.getContent()));
-                }
-            }
-
-            String reply = chatClient.prompt()
-                    .messages(messages)
-                    .call()
-                    .content();
-
-            ChatResponseDTO responseDTO = ChatResponseDTO.builder()
-                    .reply(reply)
-                    .build();
-
-            return Result.ok(responseDTO);
-
-        } catch (Exception e) {
-            log.error("FAQ查询失败", e);
-            return Result.fail("AI服务异常: " + e.getMessage());
-        }
-    }
+//    /**
+//     * 常见问题查询
+//     *
+//     * @param request 用户查询
+//     * @return 常见问题答案
+//     */
+//    @PostMapping("/faq")
+//    public Result<ChatResponseDTO> getFAQ(@RequestBody ChatRequestDTO request) {
+//        try {
+//            log.info("收到常见问题查询请求");
+//
+//            String systemPrompt = """
+//                你是一个FAQ（常见问题）助手，专门回答用户关于Halo刷题网的常见问题。
+//                重点关注以下方面：
+//                1. 账号注册与登录
+//                2. 题库使用方法
+//                3. 学习计划创建
+//                4. 排行榜规则
+//                5. 练习记录查询
+//                请给出简洁明了的答案。
+//                """;
+//
+//            List<Message> messages = new ArrayList<>();
+//            messages.add(new SystemMessage(systemPrompt));
+//
+//            for (ChatMessageDTO messageDTO : request.getMessages()) {
+//                if ("user".equalsIgnoreCase(messageDTO.getRole())) {
+//                    messages.add(new UserMessage(messageDTO.getContent()));
+//                }
+//            }
+//
+//            String reply = chatClient.prompt()
+//                    .messages(messages)
+//                    .call()
+//                    .content();
+//
+//            ChatResponseDTO responseDTO = ChatResponseDTO.builder()
+//                    .reply(reply)
+//                    .build();
+//
+//            return Result.ok(responseDTO);
+//
+//        } catch (Exception e) {
+//            log.error("FAQ查询失败", e);
+//            return Result.fail("AI服务异常: " + e.getMessage());
+//        }
+//    }
 
 }

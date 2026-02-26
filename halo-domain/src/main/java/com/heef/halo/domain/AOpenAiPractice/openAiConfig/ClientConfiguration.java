@@ -1,43 +1,91 @@
 package com.heef.halo.domain.AOpenAiPractice.openAiConfig;
 
+import com.heef.halo.domain.AOpenAiPractice.openAiConstantSystem.SystemConstants;
+import com.heef.halo.domain.AOpenAiPractice.openAiTools.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.support.ToolCallbacks;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.method.MethodToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * 自定义大模型聊天对话配置
+ * 自定义大模型聊天对话配置(定义多个chatClient--来实现多种角色,当接口需要调用时候,可以根据chatClient名称来选择调用那些)
  *
  * @author kyrie.huang
  * @date 2026/2/24 17:48
  */
 @Configuration
+@RequiredArgsConstructor
 public class ClientConfiguration {
 
-    //OpenAiChatModel这个是yml文件里面的spring ai配置注入的文件
+
+    @Autowired
+    private  ChatMemory chatMemory;
+
+//    @Autowired
+//    private ChatMemoryRepository chatMemoryRepository; //默认使用内存存储
+
+
+    /**
+     * 机器人对话client
+     * @param openAiChatModel
+     * @param chatMemory
+     * @return
+     */
     @Bean
-    public ChatClient chatClient(OpenAiChatModel openAiChatModel, ChatMemoryRepository chatMemoryRepository) {
+    public ChatClient chatClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory) {
         return ChatClient
                 .builder(openAiChatModel)
-                //定义系统模型提示词角色--
-                .defaultSystem("你是一个刷题智能助手,精通java后端开发的所有知识点,你的名字叫做kyrie.huang,请以专业的开发人员的语气来回答相关问题")
-                //定义日志通知(在spring ai 中提供基于aop的环绕通知--可以记录ai对话之间的日志)
+                .defaultSystem(SystemConstants.SYSTEM_CLIENT_PROMPT)
                 .defaultAdvisors(
-                        new SimpleLoggerAdvisor())
+                        //会话记忆advisors
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(), // ✅ Builder方式  之前的new MessageChatMemoryAdvisor(chatMemory)已废弃
+                        //日志advisors
+                        new SimpleLoggerAdvisor()
+                )
                 .build();
     }
-    
-    // 配置内存聊天记忆存储
+
+
+    /**
+     * 智能客服角色Client
+     * @param openAiChatModel
+     * @param chatMemory
+     * @param chatTools
+     * @return
+     */
     @Bean
-    public ChatMemoryRepository chatMemoryRepository() {
-        return new InMemoryChatMemoryRepository();
+    public ChatClient customerChatClient(OpenAiChatModel openAiChatModel,
+                                         ChatMemory chatMemory,
+                                         List<ChatTools> chatTools
+    ) {
+
+        // 将List<ChatTool>转换为ToolCallback数组
+        ToolCallback[] toolCallbacks = chatTools.stream()
+                .flatMap(tool -> Arrays.stream(ToolCallbacks.from(tool)))  // 每个工具类可能包含多个@Tool方法
+                .toArray(ToolCallback[]::new);
+
+        return ChatClient
+                .builder(openAiChatModel)
+                .defaultSystem(SystemConstants.WEB_CLIENT_PROMPT)
+                .defaultAdvisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        new SimpleLoggerAdvisor()
+                )
+                //工具tools
+                .defaultToolCallbacks(toolCallbacks)
+                .build();
     }
 }
