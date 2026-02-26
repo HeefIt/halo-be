@@ -19,5 +19,13 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatRequestDTO {
 
+    /**
+     * 消息列表
+     */
     private List<ChatMessageDTO> messages;
+
+    /**
+     * 会话id
+     */
+    private String sessionID;
 }

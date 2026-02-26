@@ -18,4 +18,5 @@ import lombok.NoArgsConstructor;
 public class ChatResponseDTO {
 
     private String reply;
+    private String sessionId;  // 新增：返回会话ID给前端
 }
