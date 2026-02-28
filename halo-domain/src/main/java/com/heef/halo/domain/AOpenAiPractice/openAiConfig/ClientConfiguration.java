@@ -1,5 +1,7 @@
 package com.heef.halo.domain.AOpenAiPractice.openAiConfig;
 
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.SimpleVectorStore;
 import com.heef.halo.domain.AOpenAiPractice.openAiConstantSystem.SystemConstants;
 import com.heef.halo.domain.AOpenAiPractice.openAiTools.*;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
@@ -34,9 +37,25 @@ public class ClientConfiguration {
     @Autowired
     private  ChatMemory chatMemory;
 
+    @Autowired
+    private OpenAiEmbeddingModel openAiEmbeddingModel;
+
+
+
 //    @Autowired
 //    private ChatMemoryRepository chatMemoryRepository; //默认使用内存存储
 
+
+
+    /**
+     * spring ai提供了一个默认简单的向量数据库
+     * @param openAiEmbeddingModel
+     * @return
+     */
+    @Bean
+    public VectorStore vectorStore(OpenAiEmbeddingModel openAiEmbeddingModel) {
+        return SimpleVectorStore.builder(openAiEmbeddingModel).build();
+    }
 
     /**
      * 机器人对话client
@@ -88,4 +107,26 @@ public class ClientConfiguration {
                 .defaultToolCallbacks(toolCallbacks)
                 .build();
     }
+
+
+    /**
+     * RAG-client
+     * @param openAiChatModel
+     * @param chatMemory
+     * @return
+     */
+    @Bean
+    public ChatClient ragChatClient(OpenAiChatModel openAiChatModel, ChatMemory chatMemory) {
+        return ChatClient
+                .builder(openAiChatModel)
+                .defaultSystem(SystemConstants.SYSTEM_CLIENT_PROMPT)
+                .defaultAdvisors(
+                        //会话记忆advisors
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(), // ✅ Builder方式  之前的new MessageChatMemoryAdvisor(chatMemory)已废弃
+                        //日志advisors
+                        new SimpleLoggerAdvisor()
+                )
+                .build();
+    }
+
 }

@@ -4,14 +4,16 @@ import com.heef.halo.domain.AOpenAiPractice.openAiDto.*;
 import com.heef.halo.result.Result;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,73 @@ import java.util.List;
 public class PracticeAssistantController {
 
     private final ChatClient chatClient;
+
+    //spring ai提供操作向量的--类似redis的redistemplate这种,chatmodel
+    @Autowired
+    private OpenAiEmbeddingModel openAiEmbeddingModel;
+
+
+
+    /**
+     * 向量模型测试
+     * @param request
+     * @return
+     */
+    @GetMapping ("/embedding")
+    public Result<float[]> getEmbedding(String request){
+        float[] results = openAiEmbeddingModel.embed(request);
+        return Result.ok(results);
+    }
+
+
+    /**
+     * 使用RAG技术拆分PDF文件的接口
+     *
+     * @param file PDF文件
+     * @return 拆分后的文本块列表
+     */
+    @PostMapping("/rag/split-pdf")
+    public Result<List<String>> splitPdfWithRag(@RequestParam("file") MultipartFile file) {
+
+       return null;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * 智能推荐题目

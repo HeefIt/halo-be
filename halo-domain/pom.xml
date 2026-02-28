@@ -137,6 +137,19 @@
 <!--            <artifactId>spring-ai-starter-vector-store-chroma</artifactId>-->
 <!--        </dependency>-->
 
+        <!--拆分pdf//document依赖-->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-pdf-document-reader</artifactId>
+        </dependency>
+
+        <!--spring ai提供的简单的显然数据库-->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-vector-store</artifactId>
+        </dependency>
+
+
     </dependencies>
 
     <!-- 🎯 新增：构建配置 -->
