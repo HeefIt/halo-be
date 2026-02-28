@@ -14,6 +14,9 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Flux;
 
 import java.util.Date;
@@ -116,14 +119,15 @@ public class OpenAiChatController {
     }
 
     /**
-     * AI对话接口 - 流式输出版本，支持会话记忆
+     * AI对话接口 - 标准SSE流式输出版本，支持会话记忆
+     * 使用ServerSentEvent包装每个流式响应块，确保SSE协议标准
      * 
      * @param request 聊天请求，包含消息历史
-     * @return 流式AI回复结果
+     * @return 标准SSE流式响应
      */
-    @PostMapping(value = "/chat/stream", produces = "text/event-stream")
-    public Flux<ChatResponseDTO> chatStream(@RequestBody ChatRequestDTO request,
-                                           @RequestHeader(value = "userId", required = false) Long userId) {
+    @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<String>> chatStream(@RequestBody ChatRequestDTO request,
+                                                   @RequestHeader(value = "userId", required = false) Long userId) {
         try {
             log.info("收到AI流式聊天请求，消息数量: {}, userId: {}", request.getMessages().size(), userId);
 
@@ -148,9 +152,9 @@ public class OpenAiChatController {
 
             log.info("当前用户消息: {}, 会话ID: {}", userMessage, sessionId);
 
-            final String finalSessionId = sessionId;  // 创建final副本(在Lambda表达式中使用的变量必须是final不可变的)
+            final String finalSessionId = sessionId;  // 创建final副本
 
-            // 4. 调用AI流式输出
+            // 4. 调用AI流式输出，使用ServerSentEvent包装每个响应块
             return chatClient.prompt()
                     .user(userMessage)  // 只传当前消息！
                     .advisors(advisor -> advisor
@@ -158,10 +162,29 @@ public class OpenAiChatController {
                     )
                     .stream()
                     .content()
-                    .map(content -> ChatResponseDTO.builder()
-                            .reply(content)
-                            .sessionId(finalSessionId)
-                            .build());
+                    .map(content -> {
+                        // 构建标准的ChatResponseDTO
+                        ChatResponseDTO responseDTO = ChatResponseDTO.builder()
+                                .reply(content)
+                                .sessionId(finalSessionId)
+                                .build();
+                        
+                        // 将DTO转换为JSON字符串
+                        try {
+                            ObjectMapper mapper = new ObjectMapper();
+                            String jsonString = mapper.writeValueAsString(responseDTO);
+                            log.debug("发送SSE事件，内容长度: {}", jsonString.length());
+                            return ServerSentEvent.<String>builder()
+                                    .data(jsonString)  // 完整的JSON字符串作为data
+                                    .build();
+                        } catch (Exception e) {
+                            log.error("JSON序列化失败", e);
+                            // fallback: 发送原始内容
+                            return ServerSentEvent.<String>builder()
+                                    .data("{\"reply\":\"" + content.replace("\"", "\\\"") + "\",\"sessionId\":\"" + finalSessionId + "\"}")
+                                    .build();
+                        }
+                    });
 
         } catch (Exception e) {
             log.error("AI流式对话失败", e);
