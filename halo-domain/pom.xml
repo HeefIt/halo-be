@@ -143,10 +143,21 @@
             <artifactId>spring-ai-pdf-document-reader</artifactId>
         </dependency>
 
-        <!--spring ai提供的简单的显然数据库-->
+        <!-- 文档解析（PDF、Word等） -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-tika-document-reader</artifactId>
+        </dependency>
+
+        <!--spring ai提供的简单的向量数据库-->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-vector-store</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-advisors-vector-store</artifactId>
         </dependency>
 
 

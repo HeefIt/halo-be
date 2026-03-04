@@ -1,0 +1,14 @@
+2026-01-27 15:06:57.494 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 30080 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-01-27 15:06:57.497 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-01-27 15:07:00.093 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-27 15:07:00.098 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-27 15:07:00.180 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 41 ms. Found 0 Redis repository interfaces.
+2026-01-27 15:07:12.868 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 16.463 seconds (process running for 18.739)
+2026-01-27 15:07:13.927 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-01-27 16:41:26.665 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 33340 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-01-27 16:41:26.667 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-01-27 16:41:28.870 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-27 16:41:28.877 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-27 16:41:28.970 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 39 ms. Found 0 Redis repository interfaces.
+2026-01-27 16:41:43.562 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 17.76 seconds (process running for 19.438)
+2026-01-27 16:41:46.277 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...

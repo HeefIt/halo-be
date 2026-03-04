@@ -137,7 +137,7 @@ mvn spring-boot:run -pl halo-starter
 
 ## API文档
 
-项目遵循RESTful API设计规范，详细接口说明请参考[接口文档](HandlerSystem.md)。
+项目遵循RESTful API设计规范，详细接口说明请参考[接口文档](../markdoc/HandlerSystem.md)。
 
 ## 部署说明
 

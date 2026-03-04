@@ -1,14 +1,518 @@
-2026-01-27 15:06:57.494 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 30080 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
-2026-01-27 15:06:57.497 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
-2026-01-27 15:07:00.093 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
-2026-01-27 15:07:00.098 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-2026-01-27 15:07:00.180 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 41 ms. Found 0 Redis repository interfaces.
-2026-01-27 15:07:12.868 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 16.463 seconds (process running for 18.739)
-2026-01-27 15:07:13.927 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
-2026-01-27 16:41:26.665 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 33340 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
-2026-01-27 16:41:26.667 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
-2026-01-27 16:41:28.870 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
-2026-01-27 16:41:28.877 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-2026-01-27 16:41:28.970 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 39 ms. Found 0 Redis repository interfaces.
-2026-01-27 16:41:43.562 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 17.76 seconds (process running for 19.438)
-2026-01-27 16:41:46.277 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-02-27 15:40:32.035 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 15484 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-02-27 15:40:32.045 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-02-27 15:40:36.321 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-27 15:40:36.330 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-27 15:40:36.483 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 111 ms. Found 0 Redis repository interfaces.
+2026-02-27 15:40:56.690 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 26.327 seconds (process running for 31.3)
+2026-02-27 15:41:00.428 WARN  [main                ] o.s.a.r.a.SpringAiRetryAutoConfiguration - Retry error. Retry count: 1, Exception: HTTP 404 - No response body available
+
+org.springframework.ai.retry.NonTransientAiException: HTTP 404 - No response body available
+	at org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration$2.handleError(SpringAiRetryAutoConfiguration.java:109)
+	at org.springframework.web.client.ResponseErrorHandler.handleError(ResponseErrorHandler.java:58)
+	at org.springframework.web.client.StatusHandler.lambda$fromErrorHandler$1(StatusHandler.java:71)
+	at org.springframework.web.client.StatusHandler.handle(StatusHandler.java:146)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.applyStatusHandlers(DefaultRestClient.java:831)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$readBody$4(DefaultRestClient.java:820)
+	at org.springframework.web.client.DefaultRestClient.readWithMessageConverters(DefaultRestClient.java:216)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.readBody(DefaultRestClient.java:819)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$toEntityInternal$2(DefaultRestClient.java:775)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchangeInternal(DefaultRestClient.java:579)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchange(DefaultRestClient.java:533)
+	at org.springframework.web.client.RestClient$RequestHeadersSpec.exchange(RestClient.java:680)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.executeAndExtract(DefaultRestClient.java:814)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntityInternal(DefaultRestClient.java:774)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntity(DefaultRestClient.java:770)
+	at org.springframework.ai.openai.api.OpenAiApi.embeddings(OpenAiApi.java:294)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$1(OpenAiEmbeddingModel.java:168)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:357)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:230)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$3(OpenAiEmbeddingModel.java:168)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.call(OpenAiEmbeddingModel.java:166)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:67)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:49)
+	at com.heef.halo.HaloStarterApplicationTests.contextLoads(HaloStarterApplicationTests.java:16)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55)
+
+2026-02-27 15:41:00.533 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-02-27 16:00:36.479 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 4856 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-02-27 16:00:36.483 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-02-27 16:00:39.800 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-27 16:00:39.816 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-27 16:00:40.007 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 123 ms. Found 0 Redis repository interfaces.
+2026-02-27 16:00:54.881 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 20.179 seconds (process running for 23.601)
+2026-02-27 16:00:57.473 WARN  [main                ] o.s.a.r.a.SpringAiRetryAutoConfiguration - Retry error. Retry count: 1, Exception: HTTP 404 - No response body available
+
+org.springframework.ai.retry.NonTransientAiException: HTTP 404 - No response body available
+	at org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration$2.handleError(SpringAiRetryAutoConfiguration.java:109)
+	at org.springframework.web.client.ResponseErrorHandler.handleError(ResponseErrorHandler.java:58)
+	at org.springframework.web.client.StatusHandler.lambda$fromErrorHandler$1(StatusHandler.java:71)
+	at org.springframework.web.client.StatusHandler.handle(StatusHandler.java:146)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.applyStatusHandlers(DefaultRestClient.java:831)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$readBody$4(DefaultRestClient.java:820)
+	at org.springframework.web.client.DefaultRestClient.readWithMessageConverters(DefaultRestClient.java:216)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.readBody(DefaultRestClient.java:819)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$toEntityInternal$2(DefaultRestClient.java:775)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchangeInternal(DefaultRestClient.java:579)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchange(DefaultRestClient.java:533)
+	at org.springframework.web.client.RestClient$RequestHeadersSpec.exchange(RestClient.java:680)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.executeAndExtract(DefaultRestClient.java:814)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntityInternal(DefaultRestClient.java:774)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntity(DefaultRestClient.java:770)
+	at org.springframework.ai.openai.api.OpenAiApi.embeddings(OpenAiApi.java:294)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$1(OpenAiEmbeddingModel.java:168)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:357)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:230)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$3(OpenAiEmbeddingModel.java:168)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.call(OpenAiEmbeddingModel.java:166)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:67)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:49)
+	at com.heef.halo.HaloStarterApplicationTests.contextLoads(HaloStarterApplicationTests.java:16)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55)
+
+2026-02-27 16:00:57.522 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-02-27 16:04:07.552 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 31184 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-02-27 16:04:07.555 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-02-27 16:04:10.921 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-27 16:04:10.947 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-27 16:04:11.161 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 143 ms. Found 0 Redis repository interfaces.
+2026-02-27 16:04:25.311 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 18.767 seconds (process running for 20.973)
+2026-02-27 16:04:27.948 WARN  [main                ] o.s.a.r.a.SpringAiRetryAutoConfiguration - Retry error. Retry count: 1, Exception: HTTP 404 - No response body available
+
+org.springframework.ai.retry.NonTransientAiException: HTTP 404 - No response body available
+	at org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration$2.handleError(SpringAiRetryAutoConfiguration.java:109)
+	at org.springframework.web.client.ResponseErrorHandler.handleError(ResponseErrorHandler.java:58)
+	at org.springframework.web.client.StatusHandler.lambda$fromErrorHandler$1(StatusHandler.java:71)
+	at org.springframework.web.client.StatusHandler.handle(StatusHandler.java:146)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.applyStatusHandlers(DefaultRestClient.java:831)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$readBody$4(DefaultRestClient.java:820)
+	at org.springframework.web.client.DefaultRestClient.readWithMessageConverters(DefaultRestClient.java:216)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.readBody(DefaultRestClient.java:819)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$toEntityInternal$2(DefaultRestClient.java:775)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchangeInternal(DefaultRestClient.java:579)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchange(DefaultRestClient.java:533)
+	at org.springframework.web.client.RestClient$RequestHeadersSpec.exchange(RestClient.java:680)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.executeAndExtract(DefaultRestClient.java:814)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntityInternal(DefaultRestClient.java:774)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntity(DefaultRestClient.java:770)
+	at org.springframework.ai.openai.api.OpenAiApi.embeddings(OpenAiApi.java:294)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$1(OpenAiEmbeddingModel.java:168)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:357)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:230)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$3(OpenAiEmbeddingModel.java:168)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.call(OpenAiEmbeddingModel.java:166)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:67)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:49)
+	at com.heef.halo.HaloStarterApplicationTests.contextLoads(HaloStarterApplicationTests.java:16)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55)
+
+2026-02-27 16:04:28.007 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-02-27 16:32:04.763 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 36300 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-02-27 16:32:04.768 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-02-27 16:32:08.271 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-27 16:32:08.286 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-27 16:32:08.450 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 101 ms. Found 0 Redis repository interfaces.
+2026-02-27 16:32:25.358 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 22.43 seconds (process running for 25.137)
+2026-02-27 16:32:28.592 WARN  [main                ] o.s.a.r.a.SpringAiRetryAutoConfiguration - Retry error. Retry count: 1, Exception: HTTP 404 - No response body available
+
+org.springframework.ai.retry.NonTransientAiException: HTTP 404 - No response body available
+	at org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration$2.handleError(SpringAiRetryAutoConfiguration.java:109)
+	at org.springframework.web.client.ResponseErrorHandler.handleError(ResponseErrorHandler.java:58)
+	at org.springframework.web.client.StatusHandler.lambda$fromErrorHandler$1(StatusHandler.java:71)
+	at org.springframework.web.client.StatusHandler.handle(StatusHandler.java:146)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.applyStatusHandlers(DefaultRestClient.java:831)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$readBody$4(DefaultRestClient.java:820)
+	at org.springframework.web.client.DefaultRestClient.readWithMessageConverters(DefaultRestClient.java:216)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.readBody(DefaultRestClient.java:819)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.lambda$toEntityInternal$2(DefaultRestClient.java:775)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchangeInternal(DefaultRestClient.java:579)
+	at org.springframework.web.client.DefaultRestClient$DefaultRequestBodyUriSpec.exchange(DefaultRestClient.java:533)
+	at org.springframework.web.client.RestClient$RequestHeadersSpec.exchange(RestClient.java:680)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.executeAndExtract(DefaultRestClient.java:814)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntityInternal(DefaultRestClient.java:774)
+	at org.springframework.web.client.DefaultRestClient$DefaultResponseSpec.toEntity(DefaultRestClient.java:770)
+	at org.springframework.ai.openai.api.OpenAiApi.embeddings(OpenAiApi.java:294)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$1(OpenAiEmbeddingModel.java:168)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:357)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:230)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.lambda$call$3(OpenAiEmbeddingModel.java:168)
+	at io.micrometer.observation.Observation.observe(Observation.java:564)
+	at org.springframework.ai.openai.OpenAiEmbeddingModel.call(OpenAiEmbeddingModel.java:166)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:67)
+	at org.springframework.ai.embedding.EmbeddingModel.embed(EmbeddingModel.java:49)
+	at com.heef.halo.HaloStarterApplicationTests.contextLoads(HaloStarterApplicationTests.java:16)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:775)
+	at org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:479)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:161)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:152)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:91)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:112)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:94)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:87)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:216)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:212)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:137)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:156)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.SessionPerRequestLauncher.execute(SessionPerRequestLauncher.java:63)
+	at com.intellij.junit5.JUnit5IdeaTestRunner.startRunnerWithArgs(JUnit5IdeaTestRunner.java:57)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:232)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:55)
+
+2026-02-27 16:32:28.654 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-02-27 16:40:25.917 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 34936 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-02-27 16:40:25.924 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-02-27 16:40:29.528 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-27 16:40:29.537 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-27 16:40:29.729 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 146 ms. Found 0 Redis repository interfaces.
+2026-02-27 16:40:46.588 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 22.094 seconds (process running for 24.974)
+2026-02-27 16:40:50.416 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
+2026-02-27 17:11:47.094 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Starting HaloStarterApplicationTests using Java 17.0.13 with PID 35144 (started by 34066 in E:\ToSchool\halo_project\halo-be\halo-starter)
+2026-02-27 17:11:47.106 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - The following 1 profile is active: "prod"
+2026-02-27 17:11:53.095 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-02-27 17:11:53.104 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-02-27 17:11:53.318 INFO  [main                ] o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 153 ms. Found 0 Redis repository interfaces.
+2026-02-27 17:12:13.854 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - Started HaloStarterApplicationTests in 30.222 seconds (process running for 32.952)
+2026-02-27 17:12:16.295 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+========== 测试2：国际冲突主题相似度对比 ==========
+2026-02-27 17:12:18.472 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+【场景一：相同文本自对比】
+2026-02-27 17:12:18.472 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 基准文本: 国际冲突导致地区局势紧张，多国呼吁通过外交途径解决争端
+2026-02-27 17:12:18.474 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 自对比 - 欧式距离: 0.0 (应为0)
+2026-02-27 17:12:18.474 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 自对比 - 余弦相似度: 0.9999999995896736 (应为1)
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+【场景二：基准文本与其他文本对比】
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 基准文本[0]: 国际冲突导致地区局势紧张，多国呼吁通过外交途径解决争端
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 对比文本[1]: 地区冲突加剧，各国敦促和平谈判解决分歧
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   欧式距离: {:.6f} 0.4792887390230942
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   余弦相似度: {:.6f} 0.8851411585615765
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+2026-02-27 17:12:18.475 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 对比文本[2]: 足球世界杯决赛即将开赛，球迷们热情高涨
+2026-02-27 17:12:18.476 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   欧式距离: {:.6f} 1.0599085542229005
+2026-02-27 17:12:18.476 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   余弦相似度: {:.6f} 0.43829695513156386
+2026-02-27 17:12:18.476 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+2026-02-27 17:12:18.476 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 对比文本[3]: 全球经济面临通胀压力，央行考虑调整利率政策
+2026-02-27 17:12:18.476 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   欧式距离: {:.6f} 0.9594537465496074
+2026-02-27 17:12:18.480 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   余弦相似度: {:.6f} 0.539724300331244
+2026-02-27 17:12:18.480 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+2026-02-27 17:12:18.480 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 对比文本[4]: 联合国安理会就地区冲突召开紧急会议，呼吁停火
+2026-02-27 17:12:18.480 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   欧式距离: {:.6f} 0.711118380567631
+2026-02-27 17:12:18.481 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   余弦相似度: {:.6f} 0.7471553431362636
+2026-02-27 17:12:18.481 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+2026-02-27 17:12:18.481 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+【场景三：相似度排序（从高到低）】
+2026-02-27 17:12:18.483 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   [0] 国际冲突导致地区局势紧张，多国... - 相似度: {:.4f} 0.9999999995896736
+2026-02-27 17:12:18.483 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   [1] 地区冲突加剧，各国敦促和平谈判... - 相似度: {:.4f} 0.8851411585615765
+2026-02-27 17:12:18.483 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   [4] 联合国安理会就地区冲突召开紧急... - 相似度: {:.4f} 0.7471553431362636
+2026-02-27 17:12:18.483 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   [3] 全球经济面临通胀压力，央行考虑... - 相似度: {:.4f} 0.539724300331244
+2026-02-27 17:12:18.483 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   [2] 足球世界杯决赛即将开赛，球迷们... - 相似度: {:.4f} 0.43829695513156386
+2026-02-27 17:12:18.509 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+========== 测试3：多组文本交叉相似度对比 ==========
+2026-02-27 17:12:19.893 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+【余弦相似度矩阵】
+2026-02-27 17:12:19.895 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -     文本           T0     T1     T2     T3     T4     T5
+2026-02-27 17:12:19.896 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - T0: 国际冲突加剧，多  1.000   0.496   0.504   0.446   0.396   0.783 
+2026-02-27 17:12:19.897 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - T1: 足球世界杯决赛即  0.496   1.000   0.534   0.429   0.464   0.468 
+2026-02-27 17:12:19.898 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - T2: 篮球比赛进入加时  0.504   0.534   1.000   0.373   0.414   0.479 
+2026-02-27 17:12:19.899 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - T3: 央行宣布降息以刺  0.446   0.429   0.373   1.000   0.594   0.432 
+2026-02-27 17:12:19.901 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - T4: 股市迎来开门红   0.396   0.464   0.414   0.594   1.000   0.331 
+2026-02-27 17:12:19.902 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - T5: 联合国召开紧急会  0.783   0.468   0.479   0.432   0.331   1.000 
+2026-02-27 17:12:19.902 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+【最相似的文本对（基于余弦相似度）】
+2026-02-27 17:12:19.904 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   T0 [国际冲突加剧，多国呼] 与 T5 [联合国召开紧急会议讨] - 相似度: {:.4f} 0.7830819689370276
+2026-02-27 17:12:19.904 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   T3 [央行宣布降息以刺激经] 与 T4 [股市迎来开门红] - 相似度: {:.4f} 0.5941764938666375
+2026-02-27 17:12:19.904 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   T1 [足球世界杯决赛即将开] 与 T2 [篮球比赛进入加时赛] - 相似度: {:.4f} 0.5335627597392455
+2026-02-27 17:12:19.904 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 
+【最不相似的文本对（基于余弦相似度）】
+2026-02-27 17:12:19.905 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   T4 [股市迎来开门红] 与 T5 [联合国召开紧急会议讨] - 相似度: {:.4f} 0.3309728174142419
+2026-02-27 17:12:19.905 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   T2 [篮球比赛进入加时赛] 与 T3 [央行宣布降息以刺激经] - 相似度: {:.4f} 0.37269101955998296
+2026-02-27 17:12:19.905 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests -   T0 [国际冲突加剧，多国呼] 与 T4 [股市迎来开门红] - 相似度: {:.4f} 0.39595203121161626
+2026-02-27 17:12:19.912 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - ========== 测试1：简单向量化测试 ==========
+2026-02-27 17:12:20.188 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 原始文本: 我爱吃苹果,我也爱用苹果
+2026-02-27 17:12:20.189 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 向量维度: 1024
+2026-02-27 17:12:20.190 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 向量前10个值: [-0.049037088, 0.035142615, -0.09066379, 0.013525843, -0.068281405, -0.030511124, -0.03296865, 0.04642833, 0.0024551626, -0.024764296]
+2026-02-27 17:12:20.190 INFO  [main                ] com.heef.halo.HaloStarterApplicationTests - 向量范数: 0.9999999633718254
+2026-02-27 17:12:20.223 INFO  [SpringApplicationShutdownHook] com.alibaba.druid.pool.DruidDataSource - {dataSource-0} closing ...
